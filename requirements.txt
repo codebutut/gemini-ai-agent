@@ -1,0 +1,12 @@
+PyQt6
+google-genai
+protobuf
+google-api-core
+google-auth
+Pygments
+markdown-it-py
+psutil  
+httpx  
+pydantic
+pylint
+coverage
