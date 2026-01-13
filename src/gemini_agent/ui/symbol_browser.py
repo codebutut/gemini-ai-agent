@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, 
                              QTreeWidget, QTreeWidgetItem, QLabel, QPushButton)
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
 from gemini_agent.core.indexer import Symbol
 
 class SymbolBrowser(QWidget):
@@ -63,6 +63,7 @@ class SymbolBrowser(QWidget):
         """)
         layout.addWidget(self.btn_refresh)
 
+    @pyqtSlot(list)
     def set_symbols(self, symbols: list[Symbol]):
         self.symbols = symbols
         self.filter_symbols(self.search_input.text())

@@ -2,7 +2,7 @@ import asyncio
 import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Optional, List, Dict, Union
+from typing import Any, Optional, List, Dict, Union, Tuple
 
 from PyQt6.QtCore import QObject, pyqtSignal, QThread
 from google import genai
@@ -229,6 +229,26 @@ class AsyncGeminiWorker(QObject):
         else:
             self.error.emit(f"An unexpected error occurred: {e}")
 
+    async def _manage_context(self, gemini_contents: List[types.Content], max_turns: int = 10) -> List[types.Content]:
+        """
+        Manages the conversation context to stay within limits and reduce latency.
+        Keeps the first user message and the last N turns.
+        """
+        # Each turn is usually 2 messages (user/model). 
+        # We keep the first message and the last max_turns * 2 messages.
+        if len(gemini_contents) <= max_turns * 2 + 1:
+            return gemini_contents
+
+        self.log.info(f"Managing context: reducing {len(gemini_contents)} parts to {max_turns * 2 + 1}")
+        
+        # Keep the first message (usually the task description)
+        new_contents = [gemini_contents[0]]
+        
+        # Keep the last N turns
+        new_contents.extend(gemini_contents[-(max_turns * 2):])
+        
+        return new_contents
+
     async def _handle_function_calls(self, client: genai.Client, gemini_contents: List[types.Content]) -> None:
         final_response_text = ""
         loop_active = True
@@ -241,6 +261,10 @@ class AsyncGeminiWorker(QObject):
 
         while loop_active and turn_count < self.config.max_turns and not self._is_cancelled:
             turn_count += 1
+            
+            # Manage context window before each turn to keep latency low
+            gemini_contents = await self._manage_context(gemini_contents)
+            
             self.status_update.emit(f"🔄 Thinking (Turn {turn_count}/{self.config.max_turns})...")
             
             await AsyncGeminiWorker.RATE_LIMITER.acquire_async()
@@ -268,26 +292,37 @@ class AsyncGeminiWorker(QObject):
             model_parts = candidate.content.parts
             gemini_contents.append(candidate.content)
 
-            function_responses = []
+            function_tasks = []
+            function_names = []
             for part in model_parts:
                 if part.function_call:
-                    # Execute tool (might be async)
-                    if asyncio.iscoroutinefunction(self.tool_executor.execute):
-                        result = await self.tool_executor.execute(part.function_call.name, {k: v for k, v in part.function_call.args.items()})
-                    else:
-                        # If ToolExecutor.execute is still sync, we can run it in a thread to not block the loop
-                        result = await asyncio.to_thread(self.tool_executor.execute, part.function_call.name, {k: v for k, v in part.function_call.args.items()})
+                    fn_name = part.function_call.name
+                    fn_args = {k: v for k, v in part.function_call.args.items()}
+                    function_names.append(fn_name)
                     
-                    if part.function_call.name in ["update_plan", "write_file"] and self.tool_executor.current_plan != self.config.initial_plan:
+                    # Parallel execution using asyncio.gather later
+                    if asyncio.iscoroutinefunction(self.tool_executor.execute):
+                        function_tasks.append(self.tool_executor.execute(fn_name, fn_args))
+                    else:
+                        function_tasks.append(asyncio.to_thread(self.tool_executor.execute, fn_name, fn_args))
+
+            function_responses = []
+            if function_tasks:
+                # Execute all tool calls in parallel
+                results = await asyncio.gather(*function_tasks)
+                
+                for fn_name, result in zip(function_names, results):
+                    # Update plan/specs if needed (ToolExecutor handles locking)
+                    if fn_name in ["update_plan", "write_file"] and self.tool_executor.current_plan != self.config.initial_plan:
                         self.plan_updated.emit(self.tool_executor.current_plan)
-                    if part.function_call.name in ["update_specs", "write_file"] and self.tool_executor.current_specs != self.config.initial_specs:
+                    if fn_name in ["update_specs", "write_file"] and self.tool_executor.current_specs != self.config.initial_specs:
                         self.specs_updated.emit(self.tool_executor.current_specs)
 
-                    current_output = f"{part.function_call.name}:{str(result)[:50]}"
+                    current_output = f"{fn_name}:{str(result)[:50]}"
                     progress_metrics.append("progress_made" if current_output != last_output else "no_progress")
                     last_output = current_output
 
-                    function_responses.append(types.Part.from_function_response(name=part.function_call.name, response={"result": result}))
+                    function_responses.append(types.Part.from_function_response(name=fn_name, response={"result": result}))
 
             if function_responses:
                 if self._is_stuck(progress_metrics):
