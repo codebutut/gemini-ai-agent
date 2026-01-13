@@ -1,5 +1,6 @@
 import sys
 import os
+import threading
 from typing import Optional, Dict, Any
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QPushButton, QLabel, QMessageBox, QFileDialog, QScrollArea, 
                              QFrame, QListWidgetItem, QSplitter, QMenu, QInputDialog, 
                              QDialog, QDockWidget) 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QMetaObject, Q_ARG
 
 from gemini_agent.config.app_config import AppConfig, ModelRegistry, Theme, Role, setup_logging
 from gemini_agent.ui.widgets import MessageBubble, AutoResizingTextEdit, AttachmentItem
@@ -394,9 +395,15 @@ class GeminiBrowser(QMainWindow):
         self.header.btn_terminal.setChecked(visible)
 
     def refresh_index(self) -> None:
-        """Refreshes the project index for symbol browsing."""
-        self.indexer.index_project()
-        self.symbol_browser.set_symbols(self.indexer.get_all_symbols())
+        """Refreshes the project index for symbol browsing in a background thread."""
+        def _bg_index():
+            self.indexer.index_project()
+            # Use QMetaObject to safely update UI from background thread
+            QMetaObject.invokeMethod(self.symbol_browser, "set_symbols", 
+                                     Qt.ConnectionType.QueuedConnection, 
+                                     Q_ARG(list, self.indexer.get_all_symbols()))
+
+        threading.Thread(target=_bg_index, daemon=True).start()
 
     def on_symbol_selected(self, symbol: Any) -> None:
         """Handles symbol selection from the symbol browser."""
@@ -541,7 +548,16 @@ class GeminiBrowser(QMainWindow):
         self.clear_chat_ui()
         session_data = self.session_manager.get_session(session_id)
         if session_data:
-            for msg in session_data.get("messages", []):
+            messages = session_data.get("messages", [])
+            # Limit to last 50 messages for performance
+            display_messages = messages[-50:] if len(messages) > 50 else messages
+            
+            if len(messages) > 50:
+                info_lbl = QLabel(f"Showing last 50 of {len(messages)} messages.")
+                info_lbl.setStyleSheet("color: #888; font-style: italic; margin-left: 50px;")
+                self.messages_layout.addWidget(info_lbl)
+
+            for msg in display_messages:
                 self.messages_layout.addWidget(MessageBubble(msg['text'], is_user=(msg['role'] == Role.USER.value), theme_mode=self.app_config.theme))
             
             self._refresh_usage_display()
@@ -554,6 +570,7 @@ class GeminiBrowser(QMainWindow):
             child = self.messages_layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
+        self.status_widget = None
 
     def show_context_menu(self, pos: Qt.AlignmentFlag) -> None:
         """Shows the context menu for a session in the sidebar."""
@@ -718,7 +735,11 @@ class GeminiBrowser(QMainWindow):
     def on_status_update(self, status_message: str) -> None:
         """Updates the status widget with the latest worker status."""
         if self.status_widget:
-            self.status_widget.set_status(status_message)
+            try:
+                self.status_widget.set_status(status_message)
+            except RuntimeError:
+                # Handle case where C++ object is deleted but Python reference remains
+                self.status_widget = None
 
     def on_usage_updated(self, session_id: str, input_tokens: int, output_tokens: int) -> None:
         """Updates the session usage data."""

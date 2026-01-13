@@ -10,3 +10,4 @@ httpx
 pydantic
 pylint
 coverage
+ruff

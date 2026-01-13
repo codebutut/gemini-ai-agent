@@ -41,17 +41,31 @@ class StatusWidget(QWidget):
         layout.addStretch()
 
     def set_status(self, text: str):
-        """Updates the status text."""
-        self.status_label.setText(text)
+        """Updates the status text safely."""
+        try:
+            # Check if the label still exists before trying to set text
+            if hasattr(self, 'status_label') and self.status_label:
+                # In PyQt6, we can also check if the underlying C++ object is deleted
+                # but a try-except block is often more portable and robust for this specific error.
+                self.status_label.setText(text)
+        except (RuntimeError, AttributeError):
+            # This happens if the C++ object has been deleted
+            pass
 
     def start_loading(self):
         """Shows and starts the GIF animation."""
-        if self.movie:
-            self.gif_label.show()
-            self.movie.start()
+        try:
+            if self.movie and self.gif_label:
+                self.gif_label.show()
+                self.movie.start()
+        except (RuntimeError, AttributeError):
+            pass
 
     def stop_loading(self):
         """Stops and hides the GIF animation."""
-        if self.movie:
-            self.movie.stop()
-            self.gif_label.hide()
+        try:
+            if self.movie and self.gif_label:
+                self.movie.stop()
+                self.gif_label.hide()
+        except (RuntimeError, AttributeError):
+            pass

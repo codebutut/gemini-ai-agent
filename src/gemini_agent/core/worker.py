@@ -269,23 +269,29 @@ class GeminiWorker(QObject):
             gemini_contents.append(candidate.content)
 
             function_responses = []
-            for part in model_parts:
-                if part.function_call:
-                    # Execute tool
-                    result = await asyncio.to_thread(self.tool_executor.execute, part.function_call.name, {k: v for k, v in part.function_call.args.items()})
-                    
-                    if part.function_call.name in ["update_plan", "write_file"] and self.tool_executor.current_plan != self.config.initial_plan:
+            function_calls = [p.function_call for p in model_parts if p.function_call]
+            
+            if function_calls:
+                # Execute all tools in parallel for this turn
+                tasks = []
+                for fc in function_calls:
+                    tasks.append(asyncio.to_thread(self.tool_executor.execute, fc.name, {k: v for k, v in fc.args.items()}))
+                
+                results = await asyncio.gather(*tasks)
+                
+                for fc, result in zip(function_calls, results):
+                    # Check if plan or specs were updated
+                    if fc.name in ["update_plan", "write_file"] and self.tool_executor.current_plan != self.config.initial_plan:
                         self.plan_updated.emit(self.tool_executor.current_plan)
-                    if part.function_call.name in ["update_specs", "write_file"] and self.tool_executor.current_specs != self.config.initial_specs:
+                    if fc.name in ["update_specs", "write_file"] and self.tool_executor.current_specs != self.config.initial_specs:
                         self.specs_updated.emit(self.tool_executor.current_specs)
 
-                    current_output = f"{part.function_call.name}:{str(result)[:50]}"
+                    current_output = f"{fc.name}:{str(result)[:50]}"
                     progress_metrics.append("progress_made" if current_output != last_output else "no_progress")
                     last_output = current_output
 
-                    function_responses.append(types.Part.from_function_response(name=part.function_call.name, response={"result": result}))
+                    function_responses.append(types.Part.from_function_response(name=fc.name, response={"result": result}))
 
-            if function_responses:
                 if self._is_stuck(progress_metrics):
                     final_response_text = "[System: Agent stuck in repetitive loop. Process stopped.]"
                     loop_active = False

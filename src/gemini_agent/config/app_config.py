@@ -165,7 +165,11 @@ class AppConfig:
     def theme(self, value: str): self.set("theme", value)
 
     @property
-    def conductor_path(self) -> str: return self.get("conductor_path", str(self.BASE_DIR / "conductor"))
+    def conductor_path(self) -> str:
+        path = self.get("conductor_path")
+        if path and Path(path).exists():
+            return path
+        return str(self.BASE_DIR / "conductor")
 
     @conductor_path.setter
     def conductor_path(self, value: str): self.set("conductor_path", value)

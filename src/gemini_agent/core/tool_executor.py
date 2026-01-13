@@ -1,5 +1,6 @@
 import logging
 import time
+import threading
 from typing import Any, Dict, Optional, Callable, Tuple
 from gemini_agent.core import tools
 from gemini_agent.config.app_config import AppConfig
@@ -8,6 +9,7 @@ from gemini_agent.core.plugins import PluginManager
 class ToolExecutor:
     """
     Handles execution of tools, including special session-specific tools.
+    Thread-safe for parallel execution.
     """
     def __init__(
         self, 
@@ -20,6 +22,7 @@ class ToolExecutor:
         self.terminal_callback = terminal_callback
         self.confirmation_callback = confirmation_callback
         self.plugin_manager = plugin_manager
+        self._lock = threading.Lock()
         
         # Session state managed by the worker but updated via tools
         self.current_plan = ""
@@ -43,7 +46,10 @@ class ToolExecutor:
 
         # Check for dangerous tools
         if fn_name in AppConfig.DANGEROUS_TOOLS:
-            allowed, modified_args = self.confirmation_callback(fn_name, fn_args)
+            # Confirmation must be serialized to avoid multiple dialogs at once
+            with self._lock:
+                allowed, modified_args = self.confirmation_callback(fn_name, fn_args)
+            
             if not allowed:
                 self.status_callback(f"🚫 Denied: {fn_name}")
                 self.terminal_callback(f"🚫 Denied: {fn_name}\n", "error")
@@ -56,7 +62,6 @@ class ToolExecutor:
 
         self.status_callback(f"⚙️ Executing: {fn_name}...")
         self.terminal_callback(f"⚙️ Executing: {fn_name}({sanitized_args})\n", "info")
-        time.sleep(0.1)
         
         try:
             if fn_name in tools.TOOL_FUNCTIONS:
@@ -83,26 +88,33 @@ class ToolExecutor:
 
     def _sanitize_args(self, fn_name: str, fn_args: Dict[str, Any]) -> Dict[str, Any]:
         """Sanitizes sensitive information in tool arguments."""
-        sanitized = fn_args.copy()
-        sensitive_keys = ["api_key", "password", "token", "secret", "content"]
+        sensitive_keys = {"api_key", "password", "token", "secret", "content"}
+        sanitized = {}
         
-        for key in sanitized:
-            if any(sk in key.lower() for sk in sensitive_keys):
-                if isinstance(sanitized[key], str):
-                    if len(sanitized[key]) > 20:
-                        sanitized[key] = f"{sanitized[key][:5]}...[REDACTED]...{sanitized[key][-5:]}"
+        for key, value in fn_args.items():
+            key_lower = key.lower()
+            if any(sk in key_lower for sk in sensitive_keys):
+                if isinstance(value, str):
+                    if len(value) > 20:
+                        sanitized[key] = f"{value[:5]}...[REDACTED]...{value[-5:]}"
                     else:
                         sanitized[key] = "[REDACTED]"
+                else:
+                    sanitized[key] = value
+            else:
+                sanitized[key] = value
         return sanitized
 
     def _handle_update_plan(self, fn_args: Dict[str, Any]) -> str:
-        self.current_plan = fn_args.get("content", "")
+        with self._lock:
+            self.current_plan = fn_args.get("content", "")
         self.status_callback(f"✅ Plan updated")
         self.terminal_callback(f"📝 Plan updated\n", "success")
         return "Plan updated successfully in session context."
 
     def _handle_update_specs(self, fn_args: Dict[str, Any]) -> str:
-        self.current_specs = fn_args.get("content", "")
+        with self._lock:
+            self.current_specs = fn_args.get("content", "")
         self.status_callback(f"✅ Specifications updated")
         self.terminal_callback(f"📝 Specifications updated\n", "success")
         return "Specifications updated successfully in session context."
@@ -111,10 +123,12 @@ class ToolExecutor:
         filepath = fn_args.get("filepath", "")
         if filepath == "plan.md":
             self.status_callback(f"📖 Reading virtual plan.md")
-            return self.current_plan if self.current_plan else "plan.md is currently empty."
+            with self._lock:
+                return self.current_plan if self.current_plan else "plan.md is currently empty."
         if filepath == "specs.md":
             self.status_callback(f"📖 Reading virtual specs.md")
-            return self.current_specs if self.current_specs else "specs.md is currently empty."
+            with self._lock:
+                return self.current_specs if self.current_specs else "specs.md is currently empty."
         
         # Fallback to real file read
         return str(tools.read_file(**fn_args))
@@ -123,12 +137,14 @@ class ToolExecutor:
         filepath = fn_args.get("filepath", "")
         content = fn_args.get("content", "")
         if filepath == "plan.md":
-            self.current_plan = content
+            with self._lock:
+                self.current_plan = content
             self.status_callback(f"✅ Plan updated (via write_file)")
             self.terminal_callback(f"📝 Plan updated (via write_file)\n", "success")
             return "Successfully updated plan.md in session context."
         if filepath == "specs.md":
-            self.current_specs = content
+            with self._lock:
+                self.current_specs = content
             self.status_callback(f"✅ Specifications updated (via write_file)")
             self.terminal_callback(f"📝 Specifications updated (via write_file)\n", "success")
             return "Successfully updated specs.md in session context."

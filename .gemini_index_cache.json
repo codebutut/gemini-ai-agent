@@ -1,0 +1,4379 @@
+{
+  "./run.py": {
+    "mtime": 1768238897.696411,
+    "symbols": []
+  },
+  "./plugins/dependency_graph_plugin.py": {
+    "mtime": 1768238897.696411,
+    "symbols": [
+      {
+        "name": "DependencyGraphPlugin",
+        "kind": "class",
+        "line": 7,
+        "file_path": "plugins/dependency_graph_plugin.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "get_tools",
+        "kind": "method",
+        "line": 13,
+        "file_path": "plugins/dependency_graph_plugin.py",
+        "docstring": null,
+        "parent": "DependencyGraphPlugin"
+      },
+      {
+        "name": "execute_tool",
+        "kind": "method",
+        "line": 34,
+        "file_path": "plugins/dependency_graph_plugin.py",
+        "docstring": null,
+        "parent": "DependencyGraphPlugin"
+      },
+      {
+        "name": "_generate_graph",
+        "kind": "method",
+        "line": 41,
+        "file_path": "plugins/dependency_graph_plugin.py",
+        "docstring": null,
+        "parent": "DependencyGraphPlugin"
+      }
+    ]
+  },
+  "./plugins/system_info_plugin.py": {
+    "mtime": 1768238897.696411,
+    "symbols": [
+      {
+        "name": "SystemInfoPlugin",
+        "kind": "class",
+        "line": 7,
+        "file_path": "plugins/system_info_plugin.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "get_tools",
+        "kind": "method",
+        "line": 13,
+        "file_path": "plugins/system_info_plugin.py",
+        "docstring": null,
+        "parent": "SystemInfoPlugin"
+      },
+      {
+        "name": "execute_tool",
+        "kind": "method",
+        "line": 25,
+        "file_path": "plugins/system_info_plugin.py",
+        "docstring": null,
+        "parent": "SystemInfoPlugin"
+      }
+    ]
+  },
+  "./plugins/__init__.py": {
+    "mtime": 1768238897.696411,
+    "symbols": []
+  },
+  "./src/gemini_agent/main.py": {
+    "mtime": 1768326362.4950676,
+    "symbols": [
+      {
+        "name": "ChatController",
+        "kind": "class",
+        "line": 35,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Controller handling the business logic of the chat application.\nSeparates UI from gemini_agent.core logic and worker coordination.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 47,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": "ChatController"
+      },
+      {
+        "name": "stop_worker",
+        "kind": "method",
+        "line": 62,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Safely stops any running worker thread.",
+        "parent": "ChatController"
+      },
+      {
+        "name": "send_message",
+        "kind": "method",
+        "line": 73,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Starts the Gemini worker to process the user request.",
+        "parent": "ChatController"
+      },
+      {
+        "name": "_on_thread_finished",
+        "kind": "method",
+        "line": 141,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Cleanup when the thread finishes.",
+        "parent": "ChatController"
+      },
+      {
+        "name": "_on_worker_finished",
+        "kind": "method",
+        "line": 151,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": "ChatController"
+      },
+      {
+        "name": "confirm_tool",
+        "kind": "method",
+        "line": 156,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": "ChatController"
+      },
+      {
+        "name": "GeminiBrowser",
+        "kind": "class",
+        "line": 161,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Main window for the Gemini AI Agent application.\nHandles UI layout and delegates logic to ChatController.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 166,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_connect_controller",
+        "kind": "method",
+        "line": 196,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 204,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Initializes the main user interface components.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_setup_sidebar",
+        "kind": "method",
+        "line": 231,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Initializes the sidebar components.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_setup_chat_area",
+        "kind": "method",
+        "line": 251,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Initializes the central chat area.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_setup_terminal",
+        "kind": "method",
+        "line": 287,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Initializes the terminal dock.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_setup_input_area",
+        "kind": "method",
+        "line": 297,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Initializes the bottom input area.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "setup_settings_menu",
+        "kind": "method",
+        "line": 343,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Sets up the unified settings menu on the header button.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_populate_conductor_menu",
+        "kind": "method",
+        "line": 373,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Populates a QMenu with conductor commands.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "toggle_terminal",
+        "kind": "method",
+        "line": 386,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Toggles the visibility of the terminal dock.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_terminal_visibility_changed",
+        "kind": "method",
+        "line": 393,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Updates the terminal button state when dock visibility changes.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "refresh_index",
+        "kind": "method",
+        "line": 397,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Refreshes the project index for symbol browsing in a background thread.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_bg_index",
+        "kind": "method",
+        "line": 399,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_symbol_selected",
+        "kind": "method",
+        "line": 408,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Handles symbol selection from the symbol browser.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "run_conductor_command",
+        "kind": "method",
+        "line": 414,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Executes a specific conductor command.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "toggle_sidebar",
+        "kind": "method",
+        "line": 429,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Toggles the visibility of the sidebar.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "show_attach_menu",
+        "kind": "method",
+        "line": 435,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Shows the attachment menu.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "attach_files_dialog",
+        "kind": "method",
+        "line": 442,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Opens a dialog to select files for attachment.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "attach_folder_dialog",
+        "kind": "method",
+        "line": 449,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Opens a dialog to select a folder for attachment.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "add_attachment",
+        "kind": "method",
+        "line": 455,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Adds a file or folder to the current session's attachments.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "remove_attachment",
+        "kind": "method",
+        "line": 460,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Removes an attachment from the current session.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_update_attachment_ui",
+        "kind": "method",
+        "line": 466,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Updates the attachment list UI.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "apply_theme",
+        "kind": "method",
+        "line": 487,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Applies the current theme to the entire application.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "create_new_session",
+        "kind": "method",
+        "line": 516,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Creates a new chat session.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "update_sidebar",
+        "kind": "method",
+        "line": 528,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Updates the sidebar with the latest session list.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "load_session_from_list",
+        "kind": "method",
+        "line": 535,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Loads a session from the sidebar list.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "clear_chat_ui",
+        "kind": "method",
+        "line": 567,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Clears all message bubbles from the chat area.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "show_context_menu",
+        "kind": "method",
+        "line": 575,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Shows the context menu for a session in the sidebar.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "delete_session",
+        "kind": "method",
+        "line": 590,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Deletes a session.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "rename_session",
+        "kind": "method",
+        "line": 598,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Renames a session.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "export_session_to_markdown",
+        "kind": "method",
+        "line": 608,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Exports a session to a Markdown file.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "backup_history",
+        "kind": "method",
+        "line": 625,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Creates a backup of all chat history.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "restore_history",
+        "kind": "method",
+        "line": 634,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Restores chat history from a backup file.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "open_settings",
+        "kind": "method",
+        "line": 652,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Opens the settings dialog.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "open_conductor",
+        "kind": "method",
+        "line": 660,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Opens the conductor orchestrator dialog.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "open_plugins",
+        "kind": "method",
+        "line": 665,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Opens the plugin management dialog.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "send_message",
+        "kind": "method",
+        "line": 670,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Sends the user message to the AI model.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_start_worker",
+        "kind": "method",
+        "line": 678,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Starts the Gemini worker to process the user request.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_terminal_output",
+        "kind": "method",
+        "line": 693,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Handles terminal output from the worker.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "show_tool_confirmation",
+        "kind": "method",
+        "line": 704,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Shows a confirmation dialog for dangerous tool execution.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_response_success",
+        "kind": "method",
+        "line": 713,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Handles successful AI response.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_response_error",
+        "kind": "method",
+        "line": 725,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Handles AI response error.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_status_update",
+        "kind": "method",
+        "line": 735,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Updates the status widget with the latest worker status.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "on_usage_updated",
+        "kind": "method",
+        "line": 744,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Updates the session usage data.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "_refresh_usage_display",
+        "kind": "method",
+        "line": 750,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Refreshes the usage display in the header.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "scroll_to_bottom",
+        "kind": "method",
+        "line": 773,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Scrolls the chat area to the bottom.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "closeEvent",
+        "kind": "method",
+        "line": 778,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": "Handles the window close event.",
+        "parent": "GeminiBrowser"
+      },
+      {
+        "name": "main",
+        "kind": "function",
+        "line": 784,
+        "file_path": "src/gemini_agent/main.py",
+        "docstring": null,
+        "parent": null
+      }
+    ]
+  },
+  "./src/gemini_agent/__init__.py": {
+    "mtime": 1768238897.696411,
+    "symbols": []
+  },
+  "./src/gemini_agent/resources/__init__.py": {
+    "mtime": 1768238897.700411,
+    "symbols": []
+  },
+  "./src/gemini_agent/utils/introspection.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "get_type_map",
+        "kind": "function",
+        "line": 6,
+        "file_path": "src/gemini_agent/utils/introspection.py",
+        "docstring": "Maps Python types to Gemini API types.",
+        "parent": null
+      },
+      {
+        "name": "auto_generate_declaration",
+        "kind": "function",
+        "line": 31,
+        "file_path": "src/gemini_agent/utils/introspection.py",
+        "docstring": "Automatically generates a FunctionDeclaration from a Python function.",
+        "parent": null
+      },
+      {
+        "name": "unwrap",
+        "kind": "function",
+        "line": 54,
+        "file_path": "src/gemini_agent/utils/introspection.py",
+        "docstring": null,
+        "parent": null
+      }
+    ]
+  },
+  "./src/gemini_agent/utils/__init__.py": {
+    "mtime": 1768238897.700411,
+    "symbols": []
+  },
+  "./src/gemini_agent/utils/helpers.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "RateLimiter",
+        "kind": "class",
+        "line": 6,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "A thread-safe Token Bucket rate limiter with async support.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 10,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Initializes the RateLimiter.\n\nArgs:\n    max_requests (int): Maximum number of tokens (requests) allowed.\n    period (float): The time period in seconds for the rate limit.\n    auto_refill (bool): If True, starts a background thread to refill tokens.",
+        "parent": "RateLimiter"
+      },
+      {
+        "name": "_refill_loop",
+        "kind": "method",
+        "line": 34,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Background loop to refill tokens at a steady rate.",
+        "parent": "RateLimiter"
+      },
+      {
+        "name": "stop",
+        "kind": "method",
+        "line": 43,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Stops the refill thread.",
+        "parent": "RateLimiter"
+      },
+      {
+        "name": "acquire",
+        "kind": "method",
+        "line": 47,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Attempts to acquire a token (synchronous).\n\nArgs:\n    blocking (bool): Whether to block and wait for a token.\n    timeout (Optional[float]): Max time to wait if blocking.\n\nReturns:\n    bool: True if token acquired, False otherwise.",
+        "parent": "RateLimiter"
+      },
+      {
+        "name": "acquire_async",
+        "kind": "method",
+        "line": 76,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Attempts to acquire a token (asynchronous).\nDoes not block the event loop.",
+        "parent": "RateLimiter"
+      },
+      {
+        "name": "release",
+        "kind": "method",
+        "line": 93,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Manually releases a token back to the pool.",
+        "parent": "RateLimiter"
+      },
+      {
+        "name": "remaining",
+        "kind": "method",
+        "line": 99,
+        "file_path": "src/gemini_agent/utils/helpers.py",
+        "docstring": "Returns the number of remaining tokens.",
+        "parent": "RateLimiter"
+      }
+    ]
+  },
+  "./src/gemini_agent/utils/logger.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "StructuredFormatter",
+        "kind": "class",
+        "line": 7,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": "Custom formatter for structured logging.\nOutputs logs in a consistent format, optionally as JSON.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 12,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": null,
+        "parent": "StructuredFormatter"
+      },
+      {
+        "name": "format",
+        "kind": "method",
+        "line": 16,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": null,
+        "parent": "StructuredFormatter"
+      },
+      {
+        "name": "setup_agent_logging",
+        "kind": "function",
+        "line": 45,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": "Sets up the global logging configuration.",
+        "parent": null
+      },
+      {
+        "name": "get_logger",
+        "kind": "function",
+        "line": 65,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": "Returns a logger with the given name.",
+        "parent": null
+      },
+      {
+        "name": "AgentLoggerAdapter",
+        "kind": "class",
+        "line": 69,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": "Adapter to easily add extra data to log records.",
+        "parent": null
+      },
+      {
+        "name": "process",
+        "kind": "method",
+        "line": 71,
+        "file_path": "src/gemini_agent/utils/logger.py",
+        "docstring": null,
+        "parent": "AgentLoggerAdapter"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/session_manager.py": {
+    "mtime": 1768326281.5719924,
+    "symbols": [
+      {
+        "name": "SessionManager",
+        "kind": "class",
+        "line": 10,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Manages chat sessions, including loading, saving, and creating new sessions.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": null,
+        "parent": "SessionManager"
+      },
+      {
+        "name": "_load_history",
+        "kind": "method",
+        "line": 24,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Loads chat history from JSON file.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "save_history",
+        "kind": "method",
+        "line": 35,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Saves current sessions to JSON file with throttling.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "_perform_save_async",
+        "kind": "method",
+        "line": 56,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": null,
+        "parent": "SessionManager"
+      },
+      {
+        "name": "_perform_save",
+        "kind": "method",
+        "line": 61,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Performs the actual save operation.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "create_session",
+        "kind": "method",
+        "line": 76,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Creates a new session and returns its ID.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "delete_session",
+        "kind": "method",
+        "line": 92,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Deletes a session by ID.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "get_session",
+        "kind": "method",
+        "line": 102,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Returns session data.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "get_all_sessions",
+        "kind": "method",
+        "line": 106,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Returns all sessions.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "_update_session_field",
+        "kind": "method",
+        "line": 110,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Generic method to update a session field.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "add_message",
+        "kind": "method",
+        "line": 116,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Adds a message to a session.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "update_session_title",
+        "kind": "method",
+        "line": 132,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Updates the title of a session.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "update_session_plan",
+        "kind": "method",
+        "line": 136,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Updates the plan of a session.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "update_session_specs",
+        "kind": "method",
+        "line": 140,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Updates the specs of a session.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "update_session_config",
+        "kind": "method",
+        "line": 144,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Updates the configuration overrides for a session.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "update_session_usage",
+        "kind": "method",
+        "line": 152,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Updates the cumulative token usage for a session.",
+        "parent": "SessionManager"
+      },
+      {
+        "name": "clear_current_session",
+        "kind": "method",
+        "line": 164,
+        "file_path": "src/gemini_agent/core/session_manager.py",
+        "docstring": "Clears messages, plan, and specs in the current session.",
+        "parent": "SessionManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/review_engine.py": {
+    "mtime": 1768325464.2081254,
+    "symbols": [
+      {
+        "name": "ReviewEngine",
+        "kind": "class",
+        "line": 14,
+        "file_path": "src/gemini_agent/core/review_engine.py",
+        "docstring": "Core logic for the Deep Review system.\nHandles diff generation, static analysis, and security scanning.",
+        "parent": null
+      },
+      {
+        "name": "generate_diff_html",
+        "kind": "method",
+        "line": 37,
+        "file_path": "src/gemini_agent/core/review_engine.py",
+        "docstring": "Generates a side-by-side or unified diff in HTML format.\n\nArgs:\n    old_content: Original text content.\n    new_content: Modified text content.\n    theme_mode: UI theme ('Dark' or 'Light').\n\nReturns:\n    str: HTML formatted diff.",
+        "parent": "ReviewEngine"
+      },
+      {
+        "name": "analyze_code",
+        "kind": "method",
+        "line": 98,
+        "file_path": "src/gemini_agent/core/review_engine.py",
+        "docstring": "Performs static analysis on the code using AST, ruff (primary), and pylint (fallback).\n\nArgs:\n    code: The Python code string to analyze.\n\nReturns:\n    List[str]: A list of issues found.",
+        "parent": "ReviewEngine"
+      },
+      {
+        "name": "scan_security",
+        "kind": "method",
+        "line": 179,
+        "file_path": "src/gemini_agent/core/review_engine.py",
+        "docstring": "Scans for potential security risks using regex patterns.\n\nArgs:\n    code: The Python code string to scan.\n\nReturns:\n    List[str]: A list of potential security risks.",
+        "parent": "ReviewEngine"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/plugin_host.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "load_plugin_class",
+        "kind": "function",
+        "line": 8,
+        "file_path": "src/gemini_agent/core/plugin_host.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "main",
+        "kind": "function",
+        "line": 23,
+        "file_path": "src/gemini_agent/core/plugin_host.py",
+        "docstring": null,
+        "parent": null
+      }
+    ]
+  },
+  "./src/gemini_agent/core/indexer.py": {
+    "mtime": 1768326301.9717445,
+    "symbols": [
+      {
+        "name": "Symbol",
+        "kind": "class",
+        "line": 13,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Represents a code symbol (class, function, method) found during indexing.",
+        "parent": null
+      },
+      {
+        "name": "to_dict",
+        "kind": "method",
+        "line": 22,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Converts the Symbol object to a dictionary.",
+        "parent": "Symbol"
+      },
+      {
+        "name": "SymbolVisitor",
+        "kind": "class",
+        "line": 33,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "AST visitor to extract symbols from a Python file.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 35,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": null,
+        "parent": "SymbolVisitor"
+      },
+      {
+        "name": "visit_ClassDef",
+        "kind": "method",
+        "line": 41,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Visits a class definition and records it as a symbol.",
+        "parent": "SymbolVisitor"
+      },
+      {
+        "name": "visit_FunctionDef",
+        "kind": "method",
+        "line": 55,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Visits a function or method definition and records it as a symbol.",
+        "parent": "SymbolVisitor"
+      },
+      {
+        "name": "visit_AsyncFunctionDef",
+        "kind": "method",
+        "line": 68,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Visits an async function or method definition and records it as a symbol.",
+        "parent": "SymbolVisitor"
+      },
+      {
+        "name": "_index_file_worker",
+        "kind": "function",
+        "line": 81,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Worker function for parallel indexing. Must be top-level for pickling.",
+        "parent": null
+      },
+      {
+        "name": "Indexer",
+        "kind": "class",
+        "line": 107,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Handles project-wide indexing of Python symbols with persistent caching.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 109,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": null,
+        "parent": "Indexer"
+      },
+      {
+        "name": "_get_cache_path",
+        "kind": "method",
+        "line": 116,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Returns the path to the persistent cache file.",
+        "parent": "Indexer"
+      },
+      {
+        "name": "load_cache",
+        "kind": "method",
+        "line": 120,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Loads the index cache from disk.",
+        "parent": "Indexer"
+      },
+      {
+        "name": "save_cache",
+        "kind": "method",
+        "line": 139,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Saves the index cache to disk.",
+        "parent": "Indexer"
+      },
+      {
+        "name": "index_project",
+        "kind": "method",
+        "line": 156,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Recursively scans the project directory for Python files and indexes symbols in parallel.",
+        "parent": "Indexer"
+      },
+      {
+        "name": "search",
+        "kind": "method",
+        "line": 208,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Searches for symbols matching the query string.\n\nArgs:\n    query: The search query.\n\nReturns:\n    List[Symbol]: A list of matching symbols.",
+        "parent": "Indexer"
+      },
+      {
+        "name": "get_all_symbols",
+        "kind": "method",
+        "line": 224,
+        "file_path": "src/gemini_agent/core/indexer.py",
+        "docstring": "Returns all indexed symbols.",
+        "parent": "Indexer"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/plugins.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "Plugin",
+        "kind": "class",
+        "line": 8,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Base class for all plugins.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 15,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": null,
+        "parent": "Plugin"
+      },
+      {
+        "name": "get_tools",
+        "kind": "method",
+        "line": 18,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Return a list of tool definitions provided by this plugin.",
+        "parent": "Plugin"
+      },
+      {
+        "name": "execute_tool",
+        "kind": "method",
+        "line": 22,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Execute a tool provided by this plugin.",
+        "parent": "Plugin"
+      },
+      {
+        "name": "PluginManager",
+        "kind": "class",
+        "line": 26,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Manages discovery and loading of plugins.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 28,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": null,
+        "parent": "PluginManager"
+      },
+      {
+        "name": "discover_plugins",
+        "kind": "method",
+        "line": 36,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Discover and load plugins from the plugins directory.",
+        "parent": "PluginManager"
+      },
+      {
+        "name": "load_plugin",
+        "kind": "method",
+        "line": 44,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Load a plugin from a file.",
+        "parent": "PluginManager"
+      },
+      {
+        "name": "get_enabled_plugins",
+        "kind": "method",
+        "line": 61,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Return a list of currently enabled plugins.",
+        "parent": "PluginManager"
+      },
+      {
+        "name": "get_all_tools",
+        "kind": "method",
+        "line": 65,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Collect all tools from enabled plugins.",
+        "parent": "PluginManager"
+      },
+      {
+        "name": "execute_plugin_tool",
+        "kind": "method",
+        "line": 72,
+        "file_path": "src/gemini_agent/core/plugins.py",
+        "docstring": "Find the plugin that provides the tool and execute it.",
+        "parent": "PluginManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/tools.py": {
+    "mtime": 1768325037.0166628,
+    "symbols": [
+      {
+        "name": "tool",
+        "kind": "function",
+        "line": 40,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Decorator to register a function as a tool.",
+        "parent": null
+      },
+      {
+        "name": "FilePathArgs",
+        "kind": "class",
+        "line": 47,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "DirectoryArgs",
+        "kind": "class",
+        "line": 50,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "WriteFileArgs",
+        "kind": "class",
+        "line": 53,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "CodeArgs",
+        "kind": "class",
+        "line": 57,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "StartAppArgs",
+        "kind": "class",
+        "line": 60,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "KillProcessArgs",
+        "kind": "class",
+        "line": 65,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "RefactorArgs",
+        "kind": "class",
+        "line": 69,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "GenerateTestsArgs",
+        "kind": "class",
+        "line": 73,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "DebugArgs",
+        "kind": "class",
+        "line": 77,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "ProfileArgs",
+        "kind": "class",
+        "line": 81,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "GitArgs",
+        "kind": "class",
+        "line": 85,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "InstallPackageArgs",
+        "kind": "class",
+        "line": 89,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "FetchUrlArgs",
+        "kind": "class",
+        "line": 94,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "SearchFilesArgs",
+        "kind": "class",
+        "line": 99,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "SearchCodebaseArgs",
+        "kind": "class",
+        "line": 104,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "IntrospectionArgs",
+        "kind": "class",
+        "line": 110,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "FindInFilesArgs",
+        "kind": "class",
+        "line": 113,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "ExecutePythonEnvArgs",
+        "kind": "class",
+        "line": 118,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "DelegateArgs",
+        "kind": "class",
+        "line": 122,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "validate_args",
+        "kind": "function",
+        "line": 128,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Decorator to validate function arguments using a Pydantic model.",
+        "parent": null
+      },
+      {
+        "name": "decorator",
+        "kind": "function",
+        "line": 130,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "wrapper",
+        "kind": "function",
+        "line": 132,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "list_files",
+        "kind": "function",
+        "line": 154,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Lists all files and directories in the specified path.\n\nArgs:\n    directory: The path to list. Defaults to current directory.\n\nReturns:\n    str: A newline-separated list of items or an error message.",
+        "parent": null
+      },
+      {
+        "name": "read_file",
+        "kind": "function",
+        "line": 178,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Reads the full content of a file.\n\nArgs:\n    filepath: The path to the file to read.\n\nReturns:\n    str: File content or an error message.",
+        "parent": null
+      },
+      {
+        "name": "write_file",
+        "kind": "function",
+        "line": 207,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Writes content to a file. Overwrites the file if it exists.\n\nArgs:\n    filepath: The destination path.\n    content: The text content to write.\n\nReturns:\n    str: Success or error message.",
+        "parent": null
+      },
+      {
+        "name": "run_python",
+        "kind": "function",
+        "line": 230,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Executes Python code in a separate process and returns stdout/stderr.\nUseful for calculations, data processing, or running generated scripts.\n\nArgs:\n    code: The Python code snippet to execute.\n\nReturns:\n    str: Combined stdout and stderr or an error message.",
+        "parent": null
+      },
+      {
+        "name": "start_application",
+        "kind": "function",
+        "line": 265,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Starts a local application.\n\nArgs:\n    app_path: Path to the application executable.\n    args: Command line arguments.\n    wait: Whether to wait for the application to complete.\n\nReturns:\n    str: Status message or execution output.",
+        "parent": null
+      },
+      {
+        "name": "kill_process",
+        "kind": "function",
+        "line": 310,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Kills a running process by name or PID.\n\nArgs:\n    process_name: Name or PID of process to kill.\n    force: Force kill if process doesn't respond.\n\nReturns:\n    str: Success or error message.",
+        "parent": null
+      },
+      {
+        "name": "list_processes",
+        "kind": "function",
+        "line": 348,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Lists all running processes with resource usage.\n\nReturns:\n    str: Formatted list of top 50 processes.",
+        "parent": null
+      },
+      {
+        "name": "CodeAnalyzer",
+        "kind": "class",
+        "line": 369,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Static code analysis utilities.",
+        "parent": null
+      },
+      {
+        "name": "analyze_code",
+        "kind": "method",
+        "line": 373,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Analyzes Python code for complexity, style, and potential issues.",
+        "parent": "CodeAnalyzer"
+      },
+      {
+        "name": "_calculate_complexity",
+        "kind": "method",
+        "line": 422,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": null,
+        "parent": "CodeAnalyzer"
+      },
+      {
+        "name": "analyze_python_file",
+        "kind": "function",
+        "line": 433,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Analyze Python code for complexity, style, and potential issues.\n\nArgs:\n    filepath: Path to Python file to analyze.\n\nReturns:\n    str: Analysis report or error message.",
+        "parent": null
+      },
+      {
+        "name": "refactor_code",
+        "kind": "function",
+        "line": 447,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Refactors code based on specified changes.\n\nArgs:\n    filepath: Path to Python file.\n    changes: List of refactoring operations.\n\nReturns:\n    str: Success message or error message.",
+        "parent": null
+      },
+      {
+        "name": "generate_tests",
+        "kind": "function",
+        "line": 506,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Generates test stubs for a Python module.\n\nArgs:\n    filepath: Path to Python file to generate tests for.\n    output_dir: Directory to save test files (default: tests/ in same directory).\n\nReturns:\n    str: Success message or error message.",
+        "parent": null
+      },
+      {
+        "name": "debug_python",
+        "kind": "function",
+        "line": 551,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Debugs Python code with breakpoint support.\n\nArgs:\n    code: Python code to debug.\n    breakpoints: Line numbers to break at.\n\nReturns:\n    str: Debugging output.",
+        "parent": null
+      },
+      {
+        "name": "profile_code",
+        "kind": "function",
+        "line": 581,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Profiles Python code for performance analysis.\n\nArgs:\n    code: Python code to profile.\n    function_name: Specific function to profile (optional).\n\nReturns:\n    str: Profiling results.",
+        "parent": null
+      },
+      {
+        "name": "git_operation",
+        "kind": "function",
+        "line": 604,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Executes Git operations.\n\nArgs:\n    operation: git command (clone, pull, commit, push, etc.).\n    args: Additional arguments.\n\nReturns:\n    str: Git operation output.",
+        "parent": null
+      },
+      {
+        "name": "install_package",
+        "kind": "function",
+        "line": 628,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Installs Python packages using pip.\n\nArgs:\n    package_name: Name of package to install.\n    upgrade: Whether to upgrade if already installed.\n    dev: Whether to install dev dependencies.\n\nReturns:\n    str: Installation output.",
+        "parent": null
+      },
+      {
+        "name": "fetch_url",
+        "kind": "function",
+        "line": 654,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Fetches data from a URL.\n\nArgs:\n    url: URL to fetch.\n    method: HTTP method.\n    data: POST data (if any).\n\nReturns:\n    str: Response content or error message.",
+        "parent": null
+      },
+      {
+        "name": "search_files",
+        "kind": "function",
+        "line": 683,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Searches for files matching a pattern.\n\nArgs:\n    directory: Directory to search in.\n    pattern: Search pattern (supports * and ? wildcards).\n    recursive: Whether to search recursively.\n\nReturns:\n    str: List of found files or message.",
+        "parent": null
+      },
+      {
+        "name": "search_codebase",
+        "kind": "function",
+        "line": 712,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Fast code search using ripgrep (rg) if available, falling back to python.\n\nArgs:\n    query: Regex pattern to search for.\n    directory: Root directory.\n    file_pattern: Glob pattern (e.g., '*.py').\n    case_sensitive: Case sensitive search.\n\nReturns:\n    str: Search results.",
+        "parent": null
+      },
+      {
+        "name": "get_agent_capabilities",
+        "kind": "function",
+        "line": 756,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Introspects the agent's own capabilities, configuration, and available tools.\n\nArgs:\n    category: 'capabilities', 'tools', 'config', 'all'\n\nReturns:\n    str: Introspection report.",
+        "parent": null
+      },
+      {
+        "name": "find_in_files",
+        "kind": "function",
+        "line": 794,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Searches for text within files.\n\nArgs:\n    directory: Directory to search in.\n    search_text: Text to search for.\n    file_pattern: File pattern to search within (e.g., *.py).\n\nReturns:\n    str: Found results or message.",
+        "parent": null
+      },
+      {
+        "name": "execute_python_with_env",
+        "kind": "function",
+        "line": 824,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Executes Python code with pre-loaded imports.\n\nArgs:\n    code: Python code to execute.\n    imports: List of modules to import before execution.\n\nReturns:\n    str: Combined stdout and stderr or error message.",
+        "parent": null
+      },
+      {
+        "name": "update_plan",
+        "kind": "function",
+        "line": 847,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Updates the 'plan.md' file to track project progress and next steps.\n\nArgs:\n    content: The full updated content for plan.md.\n\nReturns:\n    str: Success or error message.",
+        "parent": null
+      },
+      {
+        "name": "update_specs",
+        "kind": "function",
+        "line": 860,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Updates the 'specs.md' file to document technical specifications and architecture.\n\nArgs:\n    content: The full updated content for specs.md.\n\nReturns:\n    str: Success or error message.",
+        "parent": null
+      },
+      {
+        "name": "delegate_to_agent",
+        "kind": "function",
+        "line": 874,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Delegates a complex task to a specialized sub-agent.\n\nArgs:\n    agent_name: Name of the specialized agent (e.g., \"QA_Tester\", \"Researcher\").\n    objective: The detailed goal for the sub-agent to achieve.\n\nReturns:\n    str: The result or report from the sub-agent.",
+        "parent": null
+      },
+      {
+        "name": "get_tool_config",
+        "kind": "function",
+        "line": 900,
+        "file_path": "src/gemini_agent/core/tools.py",
+        "docstring": "Returns the complete tool configuration for Gemini API.",
+        "parent": null
+      }
+    ]
+  },
+  "./src/gemini_agent/core/sub_agent.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "SubAgent",
+        "kind": "class",
+        "line": 13,
+        "file_path": "src/gemini_agent/core/sub_agent.py",
+        "docstring": "A specialized agent that executes a specific objective.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 21,
+        "file_path": "src/gemini_agent/core/sub_agent.py",
+        "docstring": null,
+        "parent": "SubAgent"
+      },
+      {
+        "name": "run",
+        "kind": "method",
+        "line": 29,
+        "file_path": "src/gemini_agent/core/sub_agent.py",
+        "docstring": "Runs the sub-agent loop to achieve the objective.",
+        "parent": "SubAgent"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/attachment_manager.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "AttachmentManager",
+        "kind": "class",
+        "line": 10,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Manages file attachments, including processing folders/archives and cleaning up temp files.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Initializes the AttachmentManager and creates a temporary directory.",
+        "parent": "AttachmentManager"
+      },
+      {
+        "name": "add_attachment",
+        "kind": "method",
+        "line": 19,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Adds a file or folder to attachments.\n\nIf the path is a folder or archive, it extracts/walks and returns a list \nof processed file paths.\n\nArgs:\n    file_path: The path to the file, folder, or archive.\n\nReturns:\n    List[str]: A list of all processed file paths.",
+        "parent": "AttachmentManager"
+      },
+      {
+        "name": "_process_directory",
+        "kind": "method",
+        "line": 45,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Recursively finds all files in a directory.\n\nArgs:\n    dir_path: The directory path to scan.\n\nReturns:\n    List[str]: A list of file paths.",
+        "parent": "AttachmentManager"
+      },
+      {
+        "name": "_extract_archive",
+        "kind": "method",
+        "line": 61,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Extracts zip/tar archives to temp dir and returns file paths.\n\nArgs:\n    archive_path: The path to the archive file.\n\nReturns:\n    List[str]: A list of extracted file paths.",
+        "parent": "AttachmentManager"
+      },
+      {
+        "name": "clear_attachments",
+        "kind": "method",
+        "line": 89,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Clears the list of attachments.",
+        "parent": "AttachmentManager"
+      },
+      {
+        "name": "cleanup",
+        "kind": "method",
+        "line": 93,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Removes the temporary directory and all its contents.",
+        "parent": "AttachmentManager"
+      },
+      {
+        "name": "get_attachments",
+        "kind": "method",
+        "line": 101,
+        "file_path": "src/gemini_agent/core/attachment_manager.py",
+        "docstring": "Returns the current list of attachments.\n\nReturns:\n    List[str]: The current list of attachment paths.",
+        "parent": "AttachmentManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/tool_executor.py": {
+    "mtime": 1768326392.9947572,
+    "symbols": [
+      {
+        "name": "ToolExecutor",
+        "kind": "class",
+        "line": 9,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": "Handles execution of tools, including special session-specific tools.\nThread-safe for parallel execution.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": null,
+        "parent": "ToolExecutor"
+      },
+      {
+        "name": "execute",
+        "kind": "method",
+        "line": 39,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": "Execute a tool and return the result.",
+        "parent": "ToolExecutor"
+      },
+      {
+        "name": "_sanitize_args",
+        "kind": "method",
+        "line": 89,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": "Sanitizes sensitive information in tool arguments.",
+        "parent": "ToolExecutor"
+      },
+      {
+        "name": "_handle_update_plan",
+        "kind": "method",
+        "line": 108,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": null,
+        "parent": "ToolExecutor"
+      },
+      {
+        "name": "_handle_update_specs",
+        "kind": "method",
+        "line": 115,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": null,
+        "parent": "ToolExecutor"
+      },
+      {
+        "name": "_handle_read_file",
+        "kind": "method",
+        "line": 122,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": null,
+        "parent": "ToolExecutor"
+      },
+      {
+        "name": "_handle_write_file",
+        "kind": "method",
+        "line": 136,
+        "file_path": "src/gemini_agent/core/tool_executor.py",
+        "docstring": null,
+        "parent": "ToolExecutor"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/async_worker.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "WorkerConfig",
+        "kind": "class",
+        "line": 22,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "AsyncGeminiWorker",
+        "kind": "class",
+        "line": 40,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": "Async worker to handle Gemini API requests using asyncio.\nCommunicates with the UI via signals.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 56,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "cancel",
+        "kind": "method",
+        "line": 72,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "confirm_tool",
+        "kind": "method",
+        "line": 75,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": "Called by the UI thread to provide confirmation result.",
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_request_tool_confirmation",
+        "kind": "method",
+        "line": 90,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": "Requests user confirmation for dangerous tools (async).",
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_create_config",
+        "kind": "method",
+        "line": 104,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "run_async",
+        "kind": "method",
+        "line": 124,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": "Main async execution loop.",
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "sync_confirmation_callback",
+        "kind": "method",
+        "line": 137,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_run_grounding_mode",
+        "kind": "method",
+        "line": 180,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_update_usage",
+        "kind": "method",
+        "line": 214,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_handle_run_error",
+        "kind": "method",
+        "line": 222,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_handle_function_calls",
+        "kind": "method",
+        "line": 232,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_is_valid_candidate",
+        "kind": "method",
+        "line": 313,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "_is_stuck",
+        "kind": "method",
+        "line": 323,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncGeminiWorker"
+      },
+      {
+        "name": "AsyncWorkerThread",
+        "kind": "class",
+        "line": 326,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": "A QThread that runs an asyncio event loop.\nUsed to run AsyncGeminiWorker without blocking the UI.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 331,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncWorkerThread"
+      },
+      {
+        "name": "run",
+        "kind": "method",
+        "line": 336,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncWorkerThread"
+      },
+      {
+        "name": "stop",
+        "kind": "method",
+        "line": 342,
+        "file_path": "src/gemini_agent/core/async_worker.py",
+        "docstring": null,
+        "parent": "AsyncWorkerThread"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/context_manager.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "ContextManager",
+        "kind": "class",
+        "line": 9,
+        "file_path": "src/gemini_agent/core/context_manager.py",
+        "docstring": "Handles preparation of history and current turn content for the Gemini API.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 17,
+        "file_path": "src/gemini_agent/core/context_manager.py",
+        "docstring": null,
+        "parent": "ContextManager"
+      },
+      {
+        "name": "prepare_history",
+        "kind": "method",
+        "line": 21,
+        "file_path": "src/gemini_agent/core/context_manager.py",
+        "docstring": "Convert simplified history to proper types.Content objects.",
+        "parent": "ContextManager"
+      },
+      {
+        "name": "prepare_current_turn",
+        "kind": "method",
+        "line": 34,
+        "file_path": "src/gemini_agent/core/context_manager.py",
+        "docstring": "Prepare parts for the current turn, including files and prompt.",
+        "parent": "ContextManager"
+      },
+      {
+        "name": "_load_file_content",
+        "kind": "method",
+        "line": 67,
+        "file_path": "src/gemini_agent/core/context_manager.py",
+        "docstring": "Loads file content, handling images/PDFs via upload and text directly.",
+        "parent": "ContextManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/mode_detector.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "ModeDetector",
+        "kind": "class",
+        "line": 3,
+        "file_path": "src/gemini_agent/core/mode_detector.py",
+        "docstring": "Detects whether the user likely wants web search or local operations.",
+        "parent": null
+      },
+      {
+        "name": "detect_mode",
+        "kind": "method",
+        "line": 24,
+        "file_path": "src/gemini_agent/core/mode_detector.py",
+        "docstring": "Detects the mode based on the prompt and grounding setting.\nReturns: 'grounding' or 'function_calling'",
+        "parent": "ModeDetector"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/checkpoint_manager.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "CheckpointManager",
+        "kind": "class",
+        "line": 13,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Manages project checkpoints (save states) by creating ZIP archives of the workspace.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 17,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Initializes the CheckpointManager.\n\nArgs:\n    root_dir: The project root directory.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "_ensure_dir",
+        "kind": "method",
+        "line": 38,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Ensures the checkpoint directory exists and initializes metadata.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "_load_metadata",
+        "kind": "method",
+        "line": 45,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Loads checkpoint metadata from the JSON file.\n\nReturns:\n    List[Dict[str, Any]]: A list of checkpoint metadata dictionaries.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "_save_metadata",
+        "kind": "method",
+        "line": 60,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Saves checkpoint metadata to the JSON file.\n\nArgs:\n    checkpoints: A list of checkpoint metadata dictionaries.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "create_checkpoint",
+        "kind": "method",
+        "line": 73,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Creates a new checkpoint of the project.\n\nArgs:\n    name: A descriptive name for the checkpoint.\n\nReturns:\n    Optional[Dict[str, Any]]: The created checkpoint metadata, or None if it failed.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "_is_excluded",
+        "kind": "method",
+        "line": 125,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Checks if a file or directory should be excluded.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "list_checkpoints",
+        "kind": "method",
+        "line": 134,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Returns a list of all checkpoints.\n\nReturns:\n    List[Dict[str, Any]]: List of all checkpoint metadata.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "delete_checkpoint",
+        "kind": "method",
+        "line": 143,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Deletes a checkpoint and its associated ZIP file.\n\nArgs:\n    checkpoint_id: The ID of the checkpoint to delete.\n\nReturns:\n    bool: True if deleted successfully, False otherwise.",
+        "parent": "CheckpointManager"
+      },
+      {
+        "name": "restore_checkpoint",
+        "kind": "method",
+        "line": 171,
+        "file_path": "src/gemini_agent/core/checkpoint_manager.py",
+        "docstring": "Restores the project from a checkpoint.\nCreates a safety backup before restoring.\n\nArgs:\n    checkpoint_id: The ID of the checkpoint to restore.\n\nReturns:\n    bool: True if restored successfully, False otherwise.",
+        "parent": "CheckpointManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/__init__.py": {
+    "mtime": 1768238897.700411,
+    "symbols": []
+  },
+  "./src/gemini_agent/core/worker.py": {
+    "mtime": 1768326415.5625398,
+    "symbols": [
+      {
+        "name": "WorkerConfig",
+        "kind": "class",
+        "line": 22,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "GeminiWorker",
+        "kind": "class",
+        "line": 40,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": "Async worker to handle Gemini API requests using asyncio.\nCommunicates with the UI via signals.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 56,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "cancel",
+        "kind": "method",
+        "line": 72,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "confirm_tool",
+        "kind": "method",
+        "line": 75,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": "Called by the UI thread to provide confirmation result.",
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_request_tool_confirmation",
+        "kind": "method",
+        "line": 91,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": "Requests user confirmation for dangerous tools (async).",
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_create_config",
+        "kind": "method",
+        "line": 105,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "run_async",
+        "kind": "method",
+        "line": 125,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": "Main async execution loop.",
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "sync_confirmation_callback",
+        "kind": "method",
+        "line": 139,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_run_grounding_mode",
+        "kind": "method",
+        "line": 182,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_update_usage",
+        "kind": "method",
+        "line": 215,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_handle_run_error",
+        "kind": "method",
+        "line": 223,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_handle_function_calls",
+        "kind": "method",
+        "line": 233,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_is_valid_candidate",
+        "kind": "method",
+        "line": 315,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "_is_stuck",
+        "kind": "method",
+        "line": 325,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorker"
+      },
+      {
+        "name": "GeminiWorkerThread",
+        "kind": "class",
+        "line": 328,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": "A QThread that runs an asyncio event loop.\nUsed to run GeminiWorker without blocking the UI.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 333,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorkerThread"
+      },
+      {
+        "name": "run",
+        "kind": "method",
+        "line": 338,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorkerThread"
+      },
+      {
+        "name": "stop",
+        "kind": "method",
+        "line": 346,
+        "file_path": "src/gemini_agent/core/worker.py",
+        "docstring": null,
+        "parent": "GeminiWorkerThread"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/conductor_manager.py": {
+    "mtime": 1768239998.11631,
+    "symbols": [
+      {
+        "name": "ConductorManager",
+        "kind": "class",
+        "line": 7,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Manages Conductor commands and templates.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 11,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Initializes the ConductorManager.\n\nArgs:\n    extension_path: Optional path to the conductor extension. \n                     Defaults to a 'conductor' directory sibling to 'core'.",
+        "parent": "ConductorManager"
+      },
+      {
+        "name": "_load_commands",
+        "kind": "method",
+        "line": 33,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Loads all TOML command definitions from the commands directory.",
+        "parent": "ConductorManager"
+      },
+      {
+        "name": "get_command_prompt",
+        "kind": "method",
+        "line": 47,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Returns the system prompt for a given command.\n\nArgs:\n    command_name: The name of the command.\n\nReturns:\n    Optional[str]: The command prompt, or None if not found.",
+        "parent": "ConductorManager"
+      },
+      {
+        "name": "get_available_commands",
+        "kind": "method",
+        "line": 62,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Returns a list of available command names.\n\nReturns:\n    List[str]: A list of command names.",
+        "parent": "ConductorManager"
+      },
+      {
+        "name": "is_setup",
+        "kind": "method",
+        "line": 71,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Checks if the project has the required conductor files.\n\nArgs:\n    project_path: The project directory to check. Defaults to current dir.\n\nReturns:\n    bool: True if project is set up with conductor, False otherwise.",
+        "parent": "ConductorManager"
+      },
+      {
+        "name": "get_setup_state",
+        "kind": "method",
+        "line": 85,
+        "file_path": "src/gemini_agent/core/conductor_manager.py",
+        "docstring": "Loads the setup state from the project's conductor directory.\n\nArgs:\n    project_path: The project directory. Defaults to current dir.\n\nReturns:\n    Optional[Dict[str, Any]]: The setup state dictionary, or None if not found.",
+        "parent": "ConductorManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/core/exporter.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "Exporter",
+        "kind": "class",
+        "line": 10,
+        "file_path": "src/gemini_agent/core/exporter.py",
+        "docstring": "Handles exporting sessions to Markdown and managing history backups in ZIP format.",
+        "parent": null
+      },
+      {
+        "name": "session_to_markdown",
+        "kind": "method",
+        "line": 16,
+        "file_path": "src/gemini_agent/core/exporter.py",
+        "docstring": "Converts a single session's data to a Markdown string.\n\nArgs:\n    session_data: The session data dictionary.\n\nReturns:\n    str: The session data formatted as Markdown.",
+        "parent": "Exporter"
+      },
+      {
+        "name": "export_to_file",
+        "kind": "method",
+        "line": 61,
+        "file_path": "src/gemini_agent/core/exporter.py",
+        "docstring": "Exports a session to a Markdown file.\n\nArgs:\n    session_data: The session data dictionary.\n    filepath: The destination Path.\n\nReturns:\n    bool: True if export was successful, False otherwise.",
+        "parent": "Exporter"
+      },
+      {
+        "name": "create_backup",
+        "kind": "method",
+        "line": 81,
+        "file_path": "src/gemini_agent/core/exporter.py",
+        "docstring": "Creates a ZIP backup of all sessions, including raw JSON and individual Markdown files.\n\nArgs:\n    sessions: Dictionary of all session data.\n    backup_path: The destination Path for the ZIP backup.\n\nReturns:\n    bool: True if backup was successful, False otherwise.",
+        "parent": "Exporter"
+      },
+      {
+        "name": "restore_backup",
+        "kind": "method",
+        "line": 111,
+        "file_path": "src/gemini_agent/core/exporter.py",
+        "docstring": "Restores sessions from a ZIP backup.\n\nArgs:\n    backup_path: The Path to the ZIP backup.\n\nReturns:\n    Dict[str, Any]: The restored session data, or an empty dict if it failed.",
+        "parent": "Exporter"
+      }
+    ]
+  },
+  "./src/gemini_agent/config/app_config.py": {
+    "mtime": 1768240012.132368,
+    "symbols": [
+      {
+        "name": "Theme",
+        "kind": "class",
+        "line": 10,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "Role",
+        "kind": "class",
+        "line": 14,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "ModelRegistry",
+        "kind": "class",
+        "line": 21,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "AppConfig",
+        "kind": "class",
+        "line": 67,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": "Manages application configuration with validation and persistence.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 97,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "_load_system_instruction",
+        "kind": "method",
+        "line": 105,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": "Loads the default system instruction from file.",
+        "parent": "AppConfig"
+      },
+      {
+        "name": "load",
+        "kind": "method",
+        "line": 115,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "save",
+        "kind": "method",
+        "line": 126,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": "Saves configuration. By default, saves asynchronously to avoid blocking the UI.",
+        "parent": "AppConfig"
+      },
+      {
+        "name": "_save_sync",
+        "kind": "method",
+        "line": 134,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "get",
+        "kind": "method",
+        "line": 142,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "set",
+        "kind": "method",
+        "line": 145,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "api_key",
+        "kind": "method",
+        "line": 150,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "api_key",
+        "kind": "method",
+        "line": 153,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "model",
+        "kind": "method",
+        "line": 156,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "model",
+        "kind": "method",
+        "line": 159,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "theme",
+        "kind": "method",
+        "line": 162,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "theme",
+        "kind": "method",
+        "line": 165,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "conductor_path",
+        "kind": "method",
+        "line": 168,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "conductor_path",
+        "kind": "method",
+        "line": 175,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": "AppConfig"
+      },
+      {
+        "name": "setup_logging",
+        "kind": "function",
+        "line": 177,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "load_json",
+        "kind": "function",
+        "line": 180,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "save_json",
+        "kind": "function",
+        "line": 190,
+        "file_path": "src/gemini_agent/config/app_config.py",
+        "docstring": null,
+        "parent": null
+      }
+    ]
+  },
+  "./src/gemini_agent/config/__init__.py": {
+    "mtime": 1768238897.696411,
+    "symbols": []
+  },
+  "./src/gemini_agent/ui/theme_manager.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "ThemeManager",
+        "kind": "class",
+        "line": 6,
+        "file_path": "src/gemini_agent/ui/theme_manager.py",
+        "docstring": "Manages application themes and custom CSS overrides.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 83,
+        "file_path": "src/gemini_agent/ui/theme_manager.py",
+        "docstring": null,
+        "parent": "ThemeManager"
+      },
+      {
+        "name": "apply_theme",
+        "kind": "method",
+        "line": 87,
+        "file_path": "src/gemini_agent/ui/theme_manager.py",
+        "docstring": "Applies the specified theme to the application.",
+        "parent": "ThemeManager"
+      },
+      {
+        "name": "get_bubble_style",
+        "kind": "method",
+        "line": 104,
+        "file_path": "src/gemini_agent/ui/theme_manager.py",
+        "docstring": "Returns the CSS style for chat bubbles based on the current theme.",
+        "parent": "ThemeManager"
+      },
+      {
+        "name": "get_text_color",
+        "kind": "method",
+        "line": 117,
+        "file_path": "src/gemini_agent/ui/theme_manager.py",
+        "docstring": null,
+        "parent": "ThemeManager"
+      },
+      {
+        "name": "get_link_color",
+        "kind": "method",
+        "line": 120,
+        "file_path": "src/gemini_agent/ui/theme_manager.py",
+        "docstring": null,
+        "parent": "ThemeManager"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/deep_review.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "DeepReviewDialog",
+        "kind": "class",
+        "line": 14,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 15,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 28,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "toggle_maximize",
+        "kind": "method",
+        "line": 94,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "save_changes",
+        "kind": "method",
+        "line": 102,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": "Updates internal args with the content from the source viewer.",
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "get_args",
+        "kind": "method",
+        "line": 119,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": "Returns the potentially modified arguments.",
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "apply_theme_to_dialog",
+        "kind": "method",
+        "line": 123,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "copy_source",
+        "kind": "method",
+        "line": 219,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": "DeepReviewDialog"
+      },
+      {
+        "name": "load_data",
+        "kind": "method",
+        "line": 224,
+        "file_path": "src/gemini_agent/ui/deep_review.py",
+        "docstring": null,
+        "parent": "DeepReviewDialog"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/widgets.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "AttachmentItem",
+        "kind": "class",
+        "line": 26,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Small widget to show an attached file with a remove button.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 30,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "AttachmentItem"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 36,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Initializes the attachment item UI.",
+        "parent": "AttachmentItem"
+      },
+      {
+        "name": "GeminiHighlighter",
+        "kind": "class",
+        "line": 75,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "A Qt Syntax Highlighter that uses Pygments to tokenize code.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 79,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "GeminiHighlighter"
+      },
+      {
+        "name": "_create_formats",
+        "kind": "method",
+        "line": 91,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Maps Pygments tokens to QTextCharFormat based on current theme.",
+        "parent": "GeminiHighlighter"
+      },
+      {
+        "name": "_fmt",
+        "kind": "method",
+        "line": 95,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "GeminiHighlighter"
+      },
+      {
+        "name": "highlightBlock",
+        "kind": "method",
+        "line": 112,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Applied to every block of text in the document.",
+        "parent": "GeminiHighlighter"
+      },
+      {
+        "name": "CodeBlock",
+        "kind": "class",
+        "line": 131,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "A widget to display code with a header, Copy button, and auto-sizing.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 135,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "CodeBlock"
+      },
+      {
+        "name": "initUI",
+        "kind": "method",
+        "line": 142,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "CodeBlock"
+      },
+      {
+        "name": "adjust_height",
+        "kind": "method",
+        "line": 224,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "CodeBlock"
+      },
+      {
+        "name": "copy_code",
+        "kind": "method",
+        "line": 231,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "CodeBlock"
+      },
+      {
+        "name": "MessageBubble",
+        "kind": "class",
+        "line": 241,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "A bubble for rendering Markdown text and Code Blocks nicely with justified alignment.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 245,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "initUI",
+        "kind": "method",
+        "line": 252,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "_add_markdown_text",
+        "kind": "method",
+        "line": 296,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Renders markdown text using QLabel with justified rich text.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "_add_code_block",
+        "kind": "method",
+        "line": 312,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Creates a CodeBlock widget.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "_add_toolbar",
+        "kind": "method",
+        "line": 318,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Adds a toolbar with Copy Plain Text and Copy Markdown buttons.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "_markdown_to_html",
+        "kind": "method",
+        "line": 354,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Converts Markdown to basic HTML for QLabel with justification wrapper.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "copy_plain_text",
+        "kind": "method",
+        "line": 376,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Copies the content as plain text, removing markdown formatting \nusing QTextDocument for robust stripping.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "copy_markdown",
+        "kind": "method",
+        "line": 391,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Copies the raw markdown content to the clipboard.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "_show_copied_feedback",
+        "kind": "method",
+        "line": 398,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Temporarily changes button text to provide visual feedback.",
+        "parent": "MessageBubble"
+      },
+      {
+        "name": "AutoResizingTextEdit",
+        "kind": "class",
+        "line": 405,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "A QTextEdit that expands vertically based on content.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 411,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "AutoResizingTextEdit"
+      },
+      {
+        "name": "_setup_completer",
+        "kind": "method",
+        "line": 423,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Sets up the auto-completer with initial default keywords.",
+        "parent": "AutoResizingTextEdit"
+      },
+      {
+        "name": "update_keywords",
+        "kind": "method",
+        "line": 431,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Updates the completer model with a new list of keywords.",
+        "parent": "AutoResizingTextEdit"
+      },
+      {
+        "name": "_insert_completion",
+        "kind": "method",
+        "line": 444,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": "Inserts the selected completion into the text.",
+        "parent": "AutoResizingTextEdit"
+      },
+      {
+        "name": "keyPressEvent",
+        "kind": "method",
+        "line": 453,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "AutoResizingTextEdit"
+      },
+      {
+        "name": "_text_under_cursor",
+        "kind": "method",
+        "line": 482,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "AutoResizingTextEdit"
+      },
+      {
+        "name": "adjust_height",
+        "kind": "method",
+        "line": 487,
+        "file_path": "src/gemini_agent/ui/widgets.py",
+        "docstring": null,
+        "parent": "AutoResizingTextEdit"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/plugin_dialog.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "PluginDialog",
+        "kind": "class",
+        "line": 7,
+        "file_path": "src/gemini_agent/ui/plugin_dialog.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 8,
+        "file_path": "src/gemini_agent/ui/plugin_dialog.py",
+        "docstring": null,
+        "parent": "PluginDialog"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/ui/plugin_dialog.py",
+        "docstring": null,
+        "parent": "PluginDialog"
+      },
+      {
+        "name": "refresh_plugins",
+        "kind": "method",
+        "line": 56,
+        "file_path": "src/gemini_agent/ui/plugin_dialog.py",
+        "docstring": null,
+        "parent": "PluginDialog"
+      },
+      {
+        "name": "on_selection_changed",
+        "kind": "method",
+        "line": 64,
+        "file_path": "src/gemini_agent/ui/plugin_dialog.py",
+        "docstring": null,
+        "parent": "PluginDialog"
+      },
+      {
+        "name": "on_enabled_changed",
+        "kind": "method",
+        "line": 83,
+        "file_path": "src/gemini_agent/ui/plugin_dialog.py",
+        "docstring": null,
+        "parent": "PluginDialog"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/components.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "Sidebar",
+        "kind": "class",
+        "line": 9,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Sidebar widget displaying chat history and providing search/filter functionality.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 17,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": null,
+        "parent": "Sidebar"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 24,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Initializes the sidebar user interface.",
+        "parent": "Sidebar"
+      },
+      {
+        "name": "populate_sessions",
+        "kind": "method",
+        "line": 52,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Populates the sidebar with session items.\n\nArgs:\n    sessions: Dictionary of session data.\n    current_session_id: The ID of the currently active session.",
+        "parent": "Sidebar"
+      },
+      {
+        "name": "filter_sessions",
+        "kind": "method",
+        "line": 64,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Filters and displays sessions based on search text and date categories.\n\nArgs:\n    text: The search query text.",
+        "parent": "Sidebar"
+      },
+      {
+        "name": "_on_item_clicked",
+        "kind": "method",
+        "line": 132,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Handles item click in the session list.",
+        "parent": "Sidebar"
+      },
+      {
+        "name": "SidebarContainer",
+        "kind": "class",
+        "line": 138,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Container for the sidebar that uses tabs to switch between \nChat History and Project Explorer.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 143,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": null,
+        "parent": "SidebarContainer"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 149,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Initializes the container with tabbed navigation.",
+        "parent": "SidebarContainer"
+      },
+      {
+        "name": "ChatHeader",
+        "kind": "class",
+        "line": 165,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Header widget for the chat area, containing session-level controls and status.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 173,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": null,
+        "parent": "ChatHeader"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 177,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Initializes the header UI components.",
+        "parent": "ChatHeader"
+      },
+      {
+        "name": "set_mode",
+        "kind": "method",
+        "line": 222,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Updates the mode indicator (Web Search vs Local Tools).\n\nArgs:\n    use_search: True if web search is enabled.",
+        "parent": "ChatHeader"
+      },
+      {
+        "name": "update_usage",
+        "kind": "method",
+        "line": 236,
+        "file_path": "src/gemini_agent/ui/components.py",
+        "docstring": "Updates the usage label with token count and cost.\n\nArgs:\n    total_tokens: Total tokens used.\n    estimated_cost: Estimated cost in USD.",
+        "parent": "ChatHeader"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/styles.py": {
+    "mtime": 1768238897.700411,
+    "symbols": []
+  },
+  "./src/gemini_agent/ui/symbol_browser.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "SymbolBrowser",
+        "kind": "class",
+        "line": 6,
+        "file_path": "src/gemini_agent/ui/symbol_browser.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 9,
+        "file_path": "src/gemini_agent/ui/symbol_browser.py",
+        "docstring": null,
+        "parent": "SymbolBrowser"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/ui/symbol_browser.py",
+        "docstring": null,
+        "parent": "SymbolBrowser"
+      },
+      {
+        "name": "set_symbols",
+        "kind": "method",
+        "line": 66,
+        "file_path": "src/gemini_agent/ui/symbol_browser.py",
+        "docstring": null,
+        "parent": "SymbolBrowser"
+      },
+      {
+        "name": "filter_symbols",
+        "kind": "method",
+        "line": 70,
+        "file_path": "src/gemini_agent/ui/symbol_browser.py",
+        "docstring": null,
+        "parent": "SymbolBrowser"
+      },
+      {
+        "name": "_on_item_double_clicked",
+        "kind": "method",
+        "line": 129,
+        "file_path": "src/gemini_agent/ui/symbol_browser.py",
+        "docstring": null,
+        "parent": "SymbolBrowser"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/status_widget.py": {
+    "mtime": 1768324416.743614,
+    "symbols": [
+      {
+        "name": "StatusWidget",
+        "kind": "class",
+        "line": 7,
+        "file_path": "src/gemini_agent/ui/status_widget.py",
+        "docstring": "Widget to display status text and a 'Thinking' GIF animation.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 11,
+        "file_path": "src/gemini_agent/ui/status_widget.py",
+        "docstring": null,
+        "parent": "StatusWidget"
+      },
+      {
+        "name": "initUI",
+        "kind": "method",
+        "line": 15,
+        "file_path": "src/gemini_agent/ui/status_widget.py",
+        "docstring": null,
+        "parent": "StatusWidget"
+      },
+      {
+        "name": "set_status",
+        "kind": "method",
+        "line": 43,
+        "file_path": "src/gemini_agent/ui/status_widget.py",
+        "docstring": "Updates the status text safely.",
+        "parent": "StatusWidget"
+      },
+      {
+        "name": "start_loading",
+        "kind": "method",
+        "line": 55,
+        "file_path": "src/gemini_agent/ui/status_widget.py",
+        "docstring": "Shows and starts the GIF animation.",
+        "parent": "StatusWidget"
+      },
+      {
+        "name": "stop_loading",
+        "kind": "method",
+        "line": 64,
+        "file_path": "src/gemini_agent/ui/status_widget.py",
+        "docstring": "Stops and hides the GIF animation.",
+        "parent": "StatusWidget"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/project_explorer.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "ProjectExplorer",
+        "kind": "class",
+        "line": 9,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": "A widget that displays the project file structure and allows \nattaching files/folders to the chat.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 18,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 23,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "filter_files",
+        "kind": "method",
+        "line": 71,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "show_context_menu",
+        "kind": "method",
+        "line": 79,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "emit_attach",
+        "kind": "method",
+        "line": 106,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "on_double_clicked",
+        "kind": "method",
+        "line": 112,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "copy_to_clipboard",
+        "kind": "method",
+        "line": 117,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      },
+      {
+        "name": "apply_theme",
+        "kind": "method",
+        "line": 121,
+        "file_path": "src/gemini_agent/ui/project_explorer.py",
+        "docstring": null,
+        "parent": "ProjectExplorer"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/conductor_dialog.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "ConductorDialog",
+        "kind": "class",
+        "line": 9,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Dialog for managing Conductor files and commands.\nProvides a centralized interface for project orchestration.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": null,
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 23,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": null,
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "refresh_commands",
+        "kind": "method",
+        "line": 88,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Refreshes the list of available conductor commands.",
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "load_files",
+        "kind": "method",
+        "line": 97,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Loads conductor files from the project directory.",
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "save_files",
+        "kind": "method",
+        "line": 119,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Saves the current content of the text edits to conductor files.",
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "generate_templates",
+        "kind": "method",
+        "line": 140,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Fills the text edits with default templates if they are empty or requested.",
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "run_selected_command",
+        "kind": "method",
+        "line": 155,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Executes the selected conductor command in the main window.",
+        "parent": "ConductorDialog"
+      },
+      {
+        "name": "apply_theme",
+        "kind": "method",
+        "line": 166,
+        "file_path": "src/gemini_agent/ui/conductor_dialog.py",
+        "docstring": "Applies the current application theme to the dialog.",
+        "parent": "ConductorDialog"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/settings_dialog.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "SettingsDialog",
+        "kind": "class",
+        "line": 10,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": "Modal dialog for application settings with scrollable content.",
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 14,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "initUI",
+        "kind": "method",
+        "line": 27,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "refresh_checkpoints",
+        "kind": "method",
+        "line": 224,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "create_checkpoint",
+        "kind": "method",
+        "line": 234,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "restore_checkpoint",
+        "kind": "method",
+        "line": 248,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "delete_checkpoint",
+        "kind": "method",
+        "line": 269,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "browse_conductor_path",
+        "kind": "method",
+        "line": 288,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "open_conductor_dialog",
+        "kind": "method",
+        "line": 298,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "save_general_settings",
+        "kind": "method",
+        "line": 303,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "on_theme_changed",
+        "kind": "method",
+        "line": 311,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "save_thinking_params",
+        "kind": "method",
+        "line": 317,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "save_generation_params",
+        "kind": "method",
+        "line": 323,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "save_system_instruction",
+        "kind": "method",
+        "line": 330,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      },
+      {
+        "name": "apply_theme_to_dialog",
+        "kind": "method",
+        "line": 335,
+        "file_path": "src/gemini_agent/ui/settings_dialog.py",
+        "docstring": null,
+        "parent": "SettingsDialog"
+      }
+    ]
+  },
+  "./src/gemini_agent/ui/__init__.py": {
+    "mtime": 1768238897.700411,
+    "symbols": []
+  },
+  "./src/gemini_agent/ui/terminal_widget.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TerminalWidget",
+        "kind": "class",
+        "line": 5,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "__init__",
+        "kind": "method",
+        "line": 6,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      },
+      {
+        "name": "init_ui",
+        "kind": "method",
+        "line": 10,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      },
+      {
+        "name": "append_text",
+        "kind": "method",
+        "line": 49,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      },
+      {
+        "name": "append_error",
+        "kind": "method",
+        "line": 64,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      },
+      {
+        "name": "append_success",
+        "kind": "method",
+        "line": 67,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      },
+      {
+        "name": "append_info",
+        "kind": "method",
+        "line": 70,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      },
+      {
+        "name": "clear",
+        "kind": "method",
+        "line": 73,
+        "file_path": "src/gemini_agent/ui/terminal_widget.py",
+        "docstring": null,
+        "parent": "TerminalWidget"
+      }
+    ]
+  },
+  "./tests/test_edit_confirmation.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestEditConfirmation",
+        "kind": "class",
+        "line": 14,
+        "file_path": "tests/test_edit_confirmation.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 15,
+        "file_path": "tests/test_edit_confirmation.py",
+        "docstring": null,
+        "parent": "TestEditConfirmation"
+      },
+      {
+        "name": "test_tool_executor_uses_modified_args",
+        "kind": "method",
+        "line": 25,
+        "file_path": "tests/test_edit_confirmation.py",
+        "docstring": null,
+        "parent": "TestEditConfirmation"
+      },
+      {
+        "name": "test_worker_confirm_tool_stores_args",
+        "kind": "method",
+        "line": 55,
+        "file_path": "tests/test_edit_confirmation.py",
+        "docstring": null,
+        "parent": "TestEditConfirmation"
+      },
+      {
+        "name": "test_dialog_save_logic",
+        "kind": "method",
+        "line": 74,
+        "file_path": "tests/test_edit_confirmation.py",
+        "docstring": null,
+        "parent": "TestEditConfirmation"
+      }
+    ]
+  },
+  "./tests/test_session_manager.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestSessionManager",
+        "kind": "class",
+        "line": 8,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 9,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 14,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "test_init_loads_history",
+        "kind": "method",
+        "line": 17,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "test_create_session",
+        "kind": "method",
+        "line": 25,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "test_delete_session",
+        "kind": "method",
+        "line": 31,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "test_add_message",
+        "kind": "method",
+        "line": 37,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "test_update_session_title",
+        "kind": "method",
+        "line": 46,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      },
+      {
+        "name": "test_clear_current_session",
+        "kind": "method",
+        "line": 51,
+        "file_path": "tests/test_session_manager.py",
+        "docstring": null,
+        "parent": "TestSessionManager"
+      }
+    ]
+  },
+  "./tests/test_worker_integration.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestWorkerIntegration",
+        "kind": "class",
+        "line": 14,
+        "file_path": "tests/test_worker_integration.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUpClass",
+        "kind": "method",
+        "line": 16,
+        "file_path": "tests/test_worker_integration.py",
+        "docstring": null,
+        "parent": "TestWorkerIntegration"
+      },
+      {
+        "name": "test_send_message_starts_thread",
+        "kind": "method",
+        "line": 25,
+        "file_path": "tests/test_worker_integration.py",
+        "docstring": null,
+        "parent": "TestWorkerIntegration"
+      }
+    ]
+  },
+  "./tests/test_rl_threads.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "test_rate_limiter_threads",
+        "kind": "function",
+        "line": 11,
+        "file_path": "tests/test_rl_threads.py",
+        "docstring": null,
+        "parent": null
+      }
+    ]
+  },
+  "./tests/test_new_features.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestNewFeatures",
+        "kind": "class",
+        "line": 10,
+        "file_path": "tests/test_new_features.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "test_search_codebase_fallback",
+        "kind": "method",
+        "line": 11,
+        "file_path": "tests/test_new_features.py",
+        "docstring": null,
+        "parent": "TestNewFeatures"
+      },
+      {
+        "name": "test_get_agent_capabilities",
+        "kind": "method",
+        "line": 25,
+        "file_path": "tests/test_new_features.py",
+        "docstring": null,
+        "parent": "TestNewFeatures"
+      }
+    ]
+  },
+  "./tests/test_sub_agent.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestSubAgent",
+        "kind": "class",
+        "line": 13,
+        "file_path": "tests/test_sub_agent.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "test_sub_agent_run",
+        "kind": "method",
+        "line": 16,
+        "file_path": "tests/test_sub_agent.py",
+        "docstring": null,
+        "parent": "TestSubAgent"
+      },
+      {
+        "name": "test_delegate_tool",
+        "kind": "method",
+        "line": 54,
+        "file_path": "tests/test_sub_agent.py",
+        "docstring": null,
+        "parent": "TestSubAgent"
+      }
+    ]
+  },
+  "./tests/test_async_bridge.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestAsyncBridge",
+        "kind": "class",
+        "line": 6,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "test_thread_to_async_callback",
+        "kind": "method",
+        "line": 7,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": "Verifies that a function running in a thread can synchronously call\nan async function running in the main loop using run_coroutine_threadsafe.",
+        "parent": "TestAsyncBridge"
+      },
+      {
+        "name": "async_target",
+        "kind": "method",
+        "line": 15,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": null,
+        "parent": "TestAsyncBridge"
+      },
+      {
+        "name": "sync_wrapper",
+        "kind": "method",
+        "line": 19,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": null,
+        "parent": "TestAsyncBridge"
+      },
+      {
+        "name": "threaded_worker",
+        "kind": "method",
+        "line": 23,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": null,
+        "parent": "TestAsyncBridge"
+      },
+      {
+        "name": "main_async_runner",
+        "kind": "method",
+        "line": 27,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": null,
+        "parent": "TestAsyncBridge"
+      },
+      {
+        "name": "target",
+        "kind": "method",
+        "line": 38,
+        "file_path": "tests/test_async_bridge.py",
+        "docstring": null,
+        "parent": "TestAsyncBridge"
+      }
+    ]
+  },
+  "./tests/test_review_engine.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestReviewEngine",
+        "kind": "class",
+        "line": 11,
+        "file_path": "tests/test_review_engine.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 12,
+        "file_path": "tests/test_review_engine.py",
+        "docstring": null,
+        "parent": "TestReviewEngine"
+      },
+      {
+        "name": "test_analyze_code_syntax_error",
+        "kind": "method",
+        "line": 15,
+        "file_path": "tests/test_review_engine.py",
+        "docstring": null,
+        "parent": "TestReviewEngine"
+      },
+      {
+        "name": "test_analyze_code_lint_issues",
+        "kind": "method",
+        "line": 20,
+        "file_path": "tests/test_review_engine.py",
+        "docstring": null,
+        "parent": "TestReviewEngine"
+      },
+      {
+        "name": "test_scan_security_risks",
+        "kind": "method",
+        "line": 33,
+        "file_path": "tests/test_review_engine.py",
+        "docstring": null,
+        "parent": "TestReviewEngine"
+      },
+      {
+        "name": "test_generate_diff_html",
+        "kind": "method",
+        "line": 39,
+        "file_path": "tests/test_review_engine.py",
+        "docstring": null,
+        "parent": "TestReviewEngine"
+      }
+    ]
+  },
+  "./tests/test_attachment_manager.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestAttachmentManager",
+        "kind": "class",
+        "line": 9,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 10,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 14,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      },
+      {
+        "name": "test_add_single_file",
+        "kind": "method",
+        "line": 18,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      },
+      {
+        "name": "test_add_directory",
+        "kind": "method",
+        "line": 27,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      },
+      {
+        "name": "test_add_zip_archive",
+        "kind": "method",
+        "line": 38,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      },
+      {
+        "name": "test_clear_attachments",
+        "kind": "method",
+        "line": 48,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      },
+      {
+        "name": "test_cleanup",
+        "kind": "method",
+        "line": 56,
+        "file_path": "tests/test_attachment_manager.py",
+        "docstring": null,
+        "parent": "TestAttachmentManager"
+      }
+    ]
+  },
+  "./tests/test_indexer.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestIndexer",
+        "kind": "class",
+        "line": 7,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 8,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": "TestIndexer"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 12,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": "TestIndexer"
+      },
+      {
+        "name": "create_test_file",
+        "kind": "method",
+        "line": 15,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": "TestIndexer"
+      },
+      {
+        "name": "test_index_simple_file",
+        "kind": "method",
+        "line": 22,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": "TestIndexer"
+      },
+      {
+        "name": "test_search",
+        "kind": "method",
+        "line": 55,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": "TestIndexer"
+      },
+      {
+        "name": "test_skip_directories",
+        "kind": "method",
+        "line": 64,
+        "file_path": "tests/test_indexer.py",
+        "docstring": null,
+        "parent": "TestIndexer"
+      }
+    ]
+  },
+  "./tests/test_max_turns.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestMaxTurns",
+        "kind": "class",
+        "line": 7,
+        "file_path": "tests/test_max_turns.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 8,
+        "file_path": "tests/test_max_turns.py",
+        "docstring": null,
+        "parent": "TestMaxTurns"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 14,
+        "file_path": "tests/test_max_turns.py",
+        "docstring": null,
+        "parent": "TestMaxTurns"
+      },
+      {
+        "name": "test_default_max_turns",
+        "kind": "method",
+        "line": 18,
+        "file_path": "tests/test_max_turns.py",
+        "docstring": null,
+        "parent": "TestMaxTurns"
+      },
+      {
+        "name": "test_set_max_turns",
+        "kind": "method",
+        "line": 21,
+        "file_path": "tests/test_max_turns.py",
+        "docstring": null,
+        "parent": "TestMaxTurns"
+      },
+      {
+        "name": "test_load_max_turns",
+        "kind": "method",
+        "line": 30,
+        "file_path": "tests/test_max_turns.py",
+        "docstring": null,
+        "parent": "TestMaxTurns"
+      }
+    ]
+  },
+  "./tests/test_exporter.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestExporter",
+        "kind": "class",
+        "line": 9,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 10,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": "TestExporter"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 23,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": "TestExporter"
+      },
+      {
+        "name": "test_session_to_markdown",
+        "kind": "method",
+        "line": 26,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": "TestExporter"
+      },
+      {
+        "name": "test_export_to_file",
+        "kind": "method",
+        "line": 37,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": "TestExporter"
+      },
+      {
+        "name": "test_create_backup",
+        "kind": "method",
+        "line": 45,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": "TestExporter"
+      },
+      {
+        "name": "test_restore_backup",
+        "kind": "method",
+        "line": 56,
+        "file_path": "tests/test_exporter.py",
+        "docstring": null,
+        "parent": "TestExporter"
+      }
+    ]
+  },
+  "./tests/test_tools.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestFileTools",
+        "kind": "class",
+        "line": 12,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 13,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestFileTools"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 19,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestFileTools"
+      },
+      {
+        "name": "test_list_files",
+        "kind": "method",
+        "line": 22,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestFileTools"
+      },
+      {
+        "name": "test_read_file",
+        "kind": "method",
+        "line": 26,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestFileTools"
+      },
+      {
+        "name": "test_write_file",
+        "kind": "method",
+        "line": 30,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestFileTools"
+      },
+      {
+        "name": "TestPythonExecution",
+        "kind": "class",
+        "line": 36,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "test_run_python_simple",
+        "kind": "method",
+        "line": 37,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestPythonExecution"
+      },
+      {
+        "name": "test_run_python_error",
+        "kind": "method",
+        "line": 42,
+        "file_path": "tests/test_tools.py",
+        "docstring": null,
+        "parent": "TestPythonExecution"
+      }
+    ]
+  },
+  "./tests/test_checkpointing.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "test_checkpoint_manager",
+        "kind": "function",
+        "line": 8,
+        "file_path": "tests/test_checkpointing.py",
+        "docstring": null,
+        "parent": null
+      }
+    ]
+  },
+  "./tests/test_worker_thread_safety.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestWorkerThreadSafety",
+        "kind": "class",
+        "line": 11,
+        "file_path": "tests/test_worker_thread_safety.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "test_confirm_tool_uses_call_soon_threadsafe",
+        "kind": "method",
+        "line": 12,
+        "file_path": "tests/test_worker_thread_safety.py",
+        "docstring": null,
+        "parent": "TestWorkerThreadSafety"
+      },
+      {
+        "name": "test_confirm_tool_fallback_when_no_loop",
+        "kind": "method",
+        "line": 37,
+        "file_path": "tests/test_worker_thread_safety.py",
+        "docstring": null,
+        "parent": "TestWorkerThreadSafety"
+      }
+    ]
+  },
+  "./tests/test_core_logic.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestCoreLogic",
+        "kind": "class",
+        "line": 17,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 18,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 23,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      },
+      {
+        "name": "test_app_config",
+        "kind": "method",
+        "line": 26,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      },
+      {
+        "name": "test_session_manager",
+        "kind": "method",
+        "line": 38,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      },
+      {
+        "name": "test_attachment_manager",
+        "kind": "method",
+        "line": 60,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      },
+      {
+        "name": "test_rate_limiter",
+        "kind": "method",
+        "line": 81,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      },
+      {
+        "name": "test_review_engine",
+        "kind": "method",
+        "line": 91,
+        "file_path": "tests/test_core_logic.py",
+        "docstring": null,
+        "parent": "TestCoreLogic"
+      }
+    ]
+  },
+  "./tests/test_usage_tracking.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestUsageTracking",
+        "kind": "class",
+        "line": 9,
+        "file_path": "tests/test_usage_tracking.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 10,
+        "file_path": "tests/test_usage_tracking.py",
+        "docstring": null,
+        "parent": "TestUsageTracking"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 15,
+        "file_path": "tests/test_usage_tracking.py",
+        "docstring": null,
+        "parent": "TestUsageTracking"
+      },
+      {
+        "name": "test_initial_usage",
+        "kind": "method",
+        "line": 18,
+        "file_path": "tests/test_usage_tracking.py",
+        "docstring": null,
+        "parent": "TestUsageTracking"
+      },
+      {
+        "name": "test_update_usage",
+        "kind": "method",
+        "line": 24,
+        "file_path": "tests/test_usage_tracking.py",
+        "docstring": null,
+        "parent": "TestUsageTracking"
+      },
+      {
+        "name": "test_cost_calculation_logic",
+        "kind": "method",
+        "line": 40,
+        "file_path": "tests/test_usage_tracking.py",
+        "docstring": null,
+        "parent": "TestUsageTracking"
+      }
+    ]
+  },
+  "./tests/test_conductor_manager.py": {
+    "mtime": 1768238897.700411,
+    "symbols": [
+      {
+        "name": "TestConductorManager",
+        "kind": "class",
+        "line": 8,
+        "file_path": "tests/test_conductor_manager.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "setUp",
+        "kind": "method",
+        "line": 9,
+        "file_path": "tests/test_conductor_manager.py",
+        "docstring": null,
+        "parent": "TestConductorManager"
+      },
+      {
+        "name": "tearDown",
+        "kind": "method",
+        "line": 19,
+        "file_path": "tests/test_conductor_manager.py",
+        "docstring": null,
+        "parent": "TestConductorManager"
+      },
+      {
+        "name": "test_load_commands",
+        "kind": "method",
+        "line": 22,
+        "file_path": "tests/test_conductor_manager.py",
+        "docstring": null,
+        "parent": "TestConductorManager"
+      },
+      {
+        "name": "test_is_setup",
+        "kind": "method",
+        "line": 27,
+        "file_path": "tests/test_conductor_manager.py",
+        "docstring": null,
+        "parent": "TestConductorManager"
+      },
+      {
+        "name": "test_get_setup_state",
+        "kind": "method",
+        "line": 41,
+        "file_path": "tests/test_conductor_manager.py",
+        "docstring": null,
+        "parent": "TestConductorManager"
+      }
+    ]
+  },
+  "./tests/test_ui_structure.py": {
+    "mtime": 1768238897.704411,
+    "symbols": [
+      {
+        "name": "TestUIStructure",
+        "kind": "class",
+        "line": 18,
+        "file_path": "tests/test_ui_structure.py",
+        "docstring": null,
+        "parent": null
+      },
+      {
+        "name": "test_chat_header_structure",
+        "kind": "method",
+        "line": 19,
+        "file_path": "tests/test_ui_structure.py",
+        "docstring": null,
+        "parent": "TestUIStructure"
+      }
+    ]
+  },
+  "./tests/__init__.py": {
+    "mtime": 1768238897.700411,
+    "symbols": []
+  }
+}

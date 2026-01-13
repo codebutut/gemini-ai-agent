@@ -48,4 +48,12 @@ Analyze and improve the following prompt:
 - Are examples provided?
 - Is the level of detail clear?
 
-**
+**Improvements:**
+- Define the exact output format (e.g., Markdown, JSON)
+- Provide few-shot examples if helpful
+- Specify the desired tone and length
+
+## Improved Prompt:
+
+[Provide the fully rewritten and optimized prompt here]
+"""

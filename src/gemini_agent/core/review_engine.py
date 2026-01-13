@@ -7,7 +7,7 @@ import tempfile
 import os
 import sys
 import logging
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,22 @@ class ReviewEngine:
     Core logic for the Deep Review system.
     Handles diff generation, static analysis, and security scanning.
     """
+
+    # Pre-compiled and combined security patterns for performance
+    _SECURITY_PATTERN = re.compile(
+        r"(?P<aws>AKIA[0-9A-Z]{16})|"
+        r"(?P<api_key>api_key\s*=\s*['\"][a-zA-Z0-9_\-]{20,}['\"])|"
+        r"(?P<password>password\s*=\s*['\"][^'\"]{6,}['\"])|"
+        r"(?P<syscall>os\.system\(|subprocess\.call\(|eval\()",
+        re.IGNORECASE
+    )
+    
+    _RISK_LABELS = {
+        "aws": "AWS Key",
+        "api_key": "Generic API Key",
+        "password": "Hardcoded Password",
+        "syscall": "Dangerous System Call"
+    }
 
     @staticmethod
     def generate_diff_html(old_content: str, new_content: str, theme_mode: str = "Dark") -> str:
@@ -81,7 +97,7 @@ class ReviewEngine:
     @staticmethod
     def analyze_code(code: str) -> List[str]:
         """
-        Performs static analysis on the code using AST and pylint.
+        Performs static analysis on the code using AST, ruff (primary), and pylint (fallback).
         
         Args:
             code: The Python code string to analyze.
@@ -96,53 +112,63 @@ class ReviewEngine:
             ast.parse(code)
         except SyntaxError as e:
             issues.append(f"CRITICAL: Syntax Error at line {e.lineno}: {e.msg}")
-            return issues # Stop here if syntax is broken
+            return issues 
         except Exception as e:
             issues.append(f"Error parsing code: {str(e)}")
             logger.error(f"AST parse error: {e}", exc_info=True)
             return issues
 
-        # 2. Advanced analysis with pylint
+        # 2. Advanced analysis
         tmp_path = None
         try:
             with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp:
                 tmp.write(code)
                 tmp_path = tmp.name
 
-            # Run pylint as a module using the current python executable
-            result = subprocess.run(
-                [
-                    sys.executable,
-                    '-m',
-                    'pylint', 
-                    '--max-line-length=120', 
-                    '--reports=n', 
-                    '--score=n',
-                    '--disable=C0114,C0115,C0116',
-                    tmp_path
-                ],
-                capture_output=True,
-                text=True,
-                timeout=15
-            )
+            # Try Ruff first (much faster)
+            try:
+                result = subprocess.run(
+                    ['ruff', 'check', '--no-cache', '--output-format=concise', tmp_path],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                if result.stdout:
+                    for line in result.stdout.splitlines():
+                        if tmp_path in line:
+                            clean_line = line.replace(tmp_path, "code.py").strip()
+                            issues.append(f"LINT (ruff): {clean_line}")
+                
+                # If ruff is found and executed (even with 0 issues), we skip pylint
+            except FileNotFoundError:
+                # Fallback to pylint if ruff is not installed
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        '-m',
+                        'pylint', 
+                        '--max-line-length=120', 
+                        '--reports=n', 
+                        '--score=n',
+                        '--disable=C0114,C0115,C0116',
+                        tmp_path
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=15
+                )
+                
+                if result.stdout:
+                    for line in result.stdout.splitlines():
+                        if not line.startswith('************* Module') and tmp_path in line:
+                            clean_line = line.replace(tmp_path, "code.py")
+                            issues.append(f"LINT (pylint): {clean_line}")
             
-            # Pylint output is in stdout
-            if result.stdout:
-                for line in result.stdout.splitlines():
-                    # Skip the module header line
-                    if line.startswith('************* Module'):
-                        continue
-                    if tmp_path in line:
-                        # Clean up the temporary filename from the output
-                        clean_line = line.replace(tmp_path, "code.py")
-                        issues.append(f"LINT: {clean_line}")
-        except FileNotFoundError:
-            issues.append("LINT: pylint not found. Please install it for advanced analysis.")
         except subprocess.TimeoutExpired:
-            issues.append("LINT: pylint timed out.")
+            issues.append("LINT: Analysis timed out.")
         except Exception as e:
-            issues.append(f"LINT: Error running pylint: {str(e)}")
-            logger.error(f"pylint execution error: {e}", exc_info=True)
+            issues.append(f"LINT: Error running analysis: {str(e)}")
+            logger.error(f"Analysis execution error: {e}", exc_info=True)
         finally:
             if tmp_path and os.path.exists(tmp_path):
                 os.remove(tmp_path)
@@ -162,16 +188,11 @@ class ReviewEngine:
         """
         risks: List[str] = []
         
-        # Regex patterns for common secrets
-        patterns = {
-            "AWS Key": r"AKIA[0-9A-Z]{16}",
-            "Generic API Key": r"api_key\s*=\s*['\"][a-zA-Z0-9]{20,}['\"]",
-            "Hardcoded Password": r"password\s*=\s*['\"][^'\"]{6,}['\"]",
-            "Dangerous System Call": r"os\.system\(|subprocess\.call\(|eval\("
-        }
-        
-        for name, pattern in patterns.items():
-            if re.search(pattern, code, re.IGNORECASE):
-                risks.append(f"WARNING: Potential {name} detected.")
+        # Use combined regex for single-pass scanning
+        for match in ReviewEngine._SECURITY_PATTERN.finditer(code):
+            for group_name, value in match.groupdict().items():
+                if value:
+                    label = ReviewEngine._RISK_LABELS.get(group_name, "Unknown Risk")
+                    risks.append(f"WARNING: Potential {label} detected.")
                 
-        return risks
+        return list(set(risks)) # Return unique risks

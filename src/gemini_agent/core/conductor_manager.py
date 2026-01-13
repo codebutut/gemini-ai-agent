@@ -16,12 +16,14 @@ class ConductorManager:
             extension_path: Optional path to the conductor extension. 
                              Defaults to a 'conductor' directory sibling to 'core'.
         """
-        # Default to a relative path if not provided
-        if extension_path is None:
-            # Points to the root project directory's conductor folder
-            self.extension_path: Path = Path(__file__).resolve().parent.parent.parent.parent / "conductor"
-        else:
+        # Use provided path if it exists, otherwise fallback to default project structure
+        if extension_path and Path(extension_path).exists():
             self.extension_path = Path(extension_path)
+        else:
+            # Points to the root project directory's conductor folder
+            # Path(__file__) is src/gemini_agent/core/conductor_manager.py
+            # .parent.parent.parent.parent is the project root
+            self.extension_path = Path(__file__).resolve().parent.parent.parent.parent / "conductor"
             
         self.commands_path: Path = self.extension_path / "commands" / "conductor"
         self.templates_path: Path = self.extension_path / "templates"

@@ -60,18 +60,17 @@ class SessionManager:
 
     def _perform_save(self) -> None:
         """Performs the actual save operation."""
-        with self._lock:
-            try:
-                sessions_copy = json.loads(json.dumps(self.sessions))
-            except Exception as e:
-                logging.error(f"Failed to copy sessions for saving: {e}")
-                return
-            self._last_save_time = time.time()
-
         try:
+            with self._lock:
+                # Serialize to string while holding the lock to ensure consistency
+                # This is much faster than json.loads(json.dumps(self.sessions))
+                data_str = json.dumps(self.sessions, indent=4, ensure_ascii=False)
+                self._last_save_time = time.time()
+
+            # Write to file outside the lock to avoid blocking other threads during I/O
             with self.history_file.open("w", encoding="utf-8") as f:
-                json.dump(sessions_copy, f, indent=4, ensure_ascii=False)
-        except OSError as e:
+                f.write(data_str)
+        except Exception as e:
             logging.error(f"Failed to save history: {e}")
 
     def create_session(self, title: str = "New Chat", config: Optional[Dict[str, Any]] = None, sync: bool = False) -> str:

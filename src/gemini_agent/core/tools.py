@@ -192,6 +192,11 @@ def read_file(filepath: str) -> str:
         if not path.is_file():
             return f"Error: '{filepath}' is not a file."
         
+        # Performance: Check file size before reading (10MB limit for safety)
+        file_size = path.stat().st_size
+        if file_size > 10 * 1024 * 1024:
+            return f"Error: File '{filepath}' is too large ({file_size / 1024 / 1024:.2f} MB). Use search or streaming tools."
+
         with open(path, 'r', encoding='utf-8', errors='replace') as f:
             return f.read()
     except PermissionError:
@@ -234,30 +239,26 @@ def run_python(code: str) -> str:
         str: Combined stdout and stderr or an error message.
     """
     try:
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as tmp:
-            tmp.write(code)
-            tmp_path = tmp.name
-
-        try:
-            result = subprocess.run(
-                [sys.executable, tmp_path],
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
+        # Performance: Use stdin instead of temporary file to reduce I/O overhead
+        result = subprocess.run(
+            [sys.executable, "-"],
+            input=code,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        
+        output = ""
+        if result.stdout:
+            output += f"Output:\n{result.stdout}\n"
+        if result.stderr:
+            output += f"Errors:\n{result.stderr}\n"
             
-            output = ""
-            if result.stdout:
-                output += f"Output:\n{result.stdout}\n"
-            if result.stderr:
-                output += f"Errors:\n{result.stderr}\n"
-                
-            return output if output else "(No output to stdout/stderr)"
-        finally:
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)
+        return output if output else "(No output to stdout/stderr)"
     except subprocess.TimeoutExpired:
         return "Error: Code execution timed out (30s limit)."
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @tool
 @validate_args(StartAppArgs)
