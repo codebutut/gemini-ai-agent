@@ -2,8 +2,16 @@ settings.json
 history.json
 __pycache__/
 *.pyc
+*.py[cod]
+*$py.class
 .env
+.venv
 env/
-.checkpoints/
+venv/
+ENV/
+.idea/
+.vscode/
 .ruff_cache/
 .gemini_index_cache.db
+.gemini_index_cache.json
+.checkpoints/
