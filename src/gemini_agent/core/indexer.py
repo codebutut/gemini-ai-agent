@@ -1,10 +1,11 @@
 import ast
 import os
 import logging
-import json
+import sqlite3
 import functools
 from dataclasses import dataclass
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Set
+from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
 
 logger = logging.getLogger(__name__)
@@ -100,77 +101,114 @@ def _index_file_worker(file_path: str, root_dir: str) -> Optional[Dict[str, Any]
             'mtime': mtime,
             'symbols': [s.to_dict() for s in visitor.symbols]
         }
-    except Exception as e:
-        # We don't log here to avoid issues with logging in subprocesses
+    except Exception:
         return None
 
 class Indexer:
-    """Handles project-wide indexing of Python symbols with persistent caching."""
+    """Handles project-wide indexing of Python symbols with persistent SQLite caching."""
     def __init__(self, root_dir: str) -> None:
         self.root_dir = root_dir
         self.symbols: List[Symbol] = []
         self.name_map: Dict[str, List[Symbol]] = {}
-        self.file_cache: Dict[str, Dict[str, Any]] = {} # path -> {mtime, symbols}
+        self.trigram_index: Dict[str, Set[int]] = defaultdict(set) # trigram -> set of symbol indices
         self.load_cache()
 
     def _get_cache_path(self) -> str:
-        """Returns the path to the persistent cache file."""
-        return os.path.join(self.root_dir, ".gemini_index_cache.json")
+        """Returns the path to the persistent SQLite cache file."""
+        return os.path.join(self.root_dir, ".gemini_index_cache.db")
+
+    def _init_db(self, conn: sqlite3.Connection):
+        """Initializes the SQLite database schema."""
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS files (
+                path TEXT PRIMARY KEY,
+                mtime REAL
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS symbols (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_path TEXT,
+                name TEXT,
+                kind TEXT,
+                line INTEGER,
+                docstring TEXT,
+                parent TEXT,
+                FOREIGN KEY(file_path) REFERENCES files(path) ON DELETE CASCADE
+            )
+        ''')
+        conn.commit()
 
     def load_cache(self) -> None:
-        """Loads the index cache from disk."""
+        """Loads the index cache from SQLite."""
         cache_path = self._get_cache_path()
-        if os.path.exists(cache_path):
-            try:
-                with open(cache_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # Convert dicts back to Symbol objects
-                    self.file_cache = {}
-                    for path, entry in data.items():
-                        symbols = [Symbol(**s) for s in entry['symbols']]
-                        self.file_cache[path] = {
-                            'mtime': entry['mtime'],
-                            'symbols': symbols
-                        }
-                logger.info(f"Loaded index cache from {cache_path}")
-            except Exception as e:
-                logger.warning(f"Failed to load index cache: {e}")
+        if not os.path.exists(cache_path):
+            return
 
-    def save_cache(self) -> None:
-        """Saves the index cache to disk."""
-        cache_path = self._get_cache_path()
         try:
-            # Convert Symbol objects to dicts for JSON serialization
-            serializable_cache = {}
-            for path, entry in self.file_cache.items():
-                serializable_cache[path] = {
-                    'mtime': entry['mtime'],
-                    'symbols': [s.to_dict() for s in entry['symbols']]
-                }
-            with open(cache_path, 'w', encoding='utf-8') as f:
-                json.dump(serializable_cache, f, indent=2)
-            logger.info(f"Saved index cache to {cache_path}")
+            conn = sqlite3.connect(cache_path)
+            self._init_db(conn)
+            cursor = conn.cursor()
+            
+            cursor.execute('SELECT name, kind, line, file_path, docstring, parent FROM symbols')
+            rows = cursor.fetchall()
+            
+            self.symbols = []
+            self.name_map = {}
+            for row in rows:
+                s = Symbol(
+                    name=row[0],
+                    kind=row[1],
+                    line=row[2],
+                    file_path=row[3],
+                    docstring=row[4],
+                    parent=row[5]
+                )
+                self.symbols.append(s)
+                self.name_map.setdefault(s.name.lower(), []).append(s)
+            
+            self._build_trigram_index()
+            conn.close()
+            logger.info(f"Loaded {len(self.symbols)} symbols from SQLite cache.")
         except Exception as e:
-            logger.error(f"Failed to save index cache: {e}")
+            logger.warning(f"Failed to load index cache: {e}")
+
+    def _build_trigram_index(self) -> None:
+        """Builds an in-memory trigram index for fast partial matching."""
+        self.trigram_index.clear()
+        for idx, s in enumerate(self.symbols):
+            name = s.name.lower()
+            if len(name) < 3:
+                self.trigram_index[name].add(idx)
+                continue
+            for i in range(len(name) - 2):
+                trigram = name[i:i+3]
+                self.trigram_index[trigram].add(idx)
 
     def index_project(self) -> None:
         """Recursively scans the project directory for Python files and indexes symbols in parallel."""
+        cache_path = self._get_cache_path()
+        conn = sqlite3.connect(cache_path)
+        self._init_db(conn)
+        cursor = conn.cursor()
+
+        # Get existing file mtimes from DB
+        cursor.execute('SELECT path, mtime FROM files')
+        db_files = {row[0]: row[1] for row in cursor.fetchall()}
+
         files_to_index = []
         current_files = set()
 
         for root, dirs, files in os.walk(self.root_dir):
-            # Skip hidden directories and common non-source dirs
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ('env', 'venv', '__pycache__', 'node_modules')]
-            
             for file in files:
                 if file.endswith('.py'):
-                    file_path = os.path.join(root, file)
+                    file_path = os.path.abspath(os.path.join(root, file))
                     current_files.add(file_path)
-                    
-                    # Check if needs update
                     try:
                         mtime = os.path.getmtime(file_path)
-                        if file_path not in self.file_cache or self.file_cache[file_path]['mtime'] != mtime:
+                        if file_path not in db_files or db_files[file_path] != mtime:
                             files_to_index.append(file_path)
                     except OSError:
                         continue
@@ -179,47 +217,77 @@ class Indexer:
         if files_to_index:
             logger.info(f"Indexing {len(files_to_index)} files in parallel...")
             worker_func = functools.partial(_index_file_worker, root_dir=self.root_dir)
-            
-            # Use max_workers=None to let it decide based on CPU count
             with ProcessPoolExecutor() as executor:
                 results = list(executor.map(worker_func, files_to_index))
             
             for res in results:
                 if res:
-                    self.file_cache[res['path']] = {
-                        'mtime': res['mtime'],
-                        'symbols': [Symbol(**s) for s in res['symbols']]
-                    }
+                    path = res['path']
+                    # Delete old symbols for this file
+                    cursor.execute('DELETE FROM symbols WHERE file_path = ?', (path,))
+                    # Insert new file info
+                    cursor.execute('INSERT OR REPLACE INTO files (path, mtime) VALUES (?, ?)', (path, res['mtime']))
+                    # Insert new symbols
+                    for s_dict in res['symbols']:
+                        cursor.execute('''
+                            INSERT INTO symbols (file_path, name, kind, line, docstring, parent)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        ''', (path, s_dict['name'], s_dict['kind'], s_dict['line'], s_dict['docstring'], s_dict['parent']))
+            conn.commit()
 
-        # Clean up cache for deleted files
-        self.file_cache = {path: data for path, data in self.file_cache.items() if path in current_files}
-        
-        # Rebuild global symbols and name_map from cache
-        self.symbols = []
-        self.name_map = {}
-        for data in self.file_cache.values():
-            file_symbols = data['symbols']
-            self.symbols.extend(file_symbols)
-            for s in file_symbols:
+        # Clean up deleted files
+        deleted_files = set(db_files.keys()) - current_files
+        if deleted_files:
+            for path in deleted_files:
+                cursor.execute('DELETE FROM files WHERE path = ?', (path,))
+                cursor.execute('DELETE FROM symbols WHERE file_path = ?', (path,))
+            conn.commit()
+
+        if files_to_index or deleted_files:
+            # Reload everything into memory if changes occurred
+            cursor.execute('SELECT name, kind, line, file_path, docstring, parent FROM symbols')
+            rows = cursor.fetchall()
+            self.symbols = []
+            self.name_map = {}
+            for row in rows:
+                s = Symbol(name=row[0], kind=row[1], line=row[2], file_path=row[3], docstring=row[4], parent=row[5])
+                self.symbols.append(s)
                 self.name_map.setdefault(s.name.lower(), []).append(s)
-        
-        self.save_cache()
+            self._build_trigram_index()
+
+        conn.close()
 
     def search(self, query: str) -> List[Symbol]:
-        """Searches for symbols matching the query string.
-        
-        Args:
-            query: The search query.
-
-        Returns:
-            List[Symbol]: A list of matching symbols.
-        """
+        """Searches for symbols matching the query string using trigram index."""
         query = query.lower()
+        if not query:
+            return []
+            
         # Exact match O(1)
         if query in self.name_map:
             return self.name_map[query]
-        # Partial match O(N)
-        return [s for s in self.symbols if query in s.name.lower()]
+            
+        if len(query) < 3:
+            # Fallback for very short queries
+            return [s for s in self.symbols if query in s.name.lower()]
+        
+        # Trigram search
+        potential_indices = None
+        for i in range(len(query) - 2):
+            trigram = query[i:i+3]
+            matches = self.trigram_index.get(trigram, set())
+            if potential_indices is None:
+                potential_indices = matches.copy()
+            else:
+                potential_indices &= matches
+            if not potential_indices:
+                break
+        
+        if not potential_indices:
+            return []
+            
+        # Final verification (filter out false positives from trigram intersection)
+        return [self.symbols[idx] for idx in potential_indices if query in self.symbols[idx].name.lower()]
 
     def get_all_symbols(self) -> List[Symbol]:
         """Returns all indexed symbols."""

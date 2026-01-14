@@ -1,128 +1,73 @@
-# Gemini AI Agent - Professional Edition
+# Gemini Agent
 
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/framework-PyQt6-green.svg)](https://www.riverbankcomputing.com/software/pyqt/)
-[![AI Model](https://img.shields.io/badge/AI-Gemini%203.0%20Pro-orange.svg)](https://deepmind.google/technologies/gemini/)
-[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
+Gemini Agent is a fully autonomous AI agent framework designed with direct local system access and Model Context Protocol (MCP) integration. It is capable of executing complex software engineering, system administration, and automation tasks.
 
-**Gemini AI Agent** is a high-performance, autonomous AI desktop application engineered for professional software developers. It seamlessly integrates advanced Large Language Model (LLM) capabilities—specifically the Google Gemini 1.5/2.0/2.5/3.0 series—directly into your local development environment.
+## Features
 
-Unlike standard chat interfaces, this agent possesses direct system access, enabling it to analyze codebases, execute complex refactoring, automate system tasks, and orchestrate multi-step engineering workflows with precision and autonomy.
+- **Autonomous Workflow:** Self-managing agent capable of planning, executing, and reflecting on tasks.
+- **Model Context Protocol (MCP):** Integrated MCP server configuration for standardized tool and context exchange.
+- **Plugin System:** Extensible architecture via the `plugins/` directory.
+- **System Operations:** Direct management of processes, files, and system resources.
+- **Python Engineering:** Built for production-grade Python development with strict typing and testing standards.
 
----
+## Installation
 
-## 🚀 Key Features
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd gemini-agent
+    ```
 
-### 🧠 Intelligent Orchestration (Conductor System)
-The **Conductor** system allows the agent to execute sophisticated, multi-step engineering workflows using specialized prompt templates.
-- **Security Audit**: Automated vulnerability scanning and security analysis.
-- **Refactor**: Intelligent code transformation and modernization.
-- **Debug & Trace**: Automated root cause analysis and bug fixing.
-- **Performance Profiling**: Identification of bottlenecks and optimization suggestions.
-- **Best Practices**: Alignment of code with industry standards and PEP 8.
+2.  **Set up a virtual environment:**
+    ```bash
+    python -m venv env
+    source env/bin/activate  # On Windows: env\Scripts\activate
+    ```
 
-### 🛠️ Autonomous Tool Execution
-The agent is equipped with a robust suite of local tools:
-- **File Operations**: Advanced search (Ripgrep integration), read/write, and batch processing.
-- **System Management**: Process monitoring, application control, and shell execution.
-- **Git Integration**: Full lifecycle management (commit, push, pull, branch management).
-- **Python Engineering**: AST-based analysis, test generation, and performance profiling.
-- **Sub-Agent Delegation**: Ability to spawn specialized sub-agents for parallel task processing.
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-### 🛡️ Safety & Control
-- **Deep Review Engine**: Intercepts all destructive or system-level actions (e.g., `write_file`, `kill_process`) for explicit user confirmation.
-- **Local-First Execution**: Operates directly on your machine, ensuring data privacy and low latency.
-- **Token & Cost Tracking**: Real-time monitoring of API usage and estimated costs per session.
+## Configuration
 
-### 🔌 Extensibility
-- **Plugin Architecture**: Easily extend the agent's capabilities with custom Python plugins.
-- **Custom Tool Registry**: A simple decorator-based system (`@tool`) for adding new capabilities.
+### MCP Configuration
+The agent is configured as an MCP server in `mcp_config.json`:
+```json
+{
+  "mcpServers": {
+    "gemini-agent": {
+      "command": "python",
+      "args": ["-m", "gemini_agent.mcp.server"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    }
+  }
+}
+```
 
----
+### Application Settings
+General application settings can be found in `settings.json`.
 
-## 🏗️ Architecture Overview
+## Usage
 
-The project follows a modular, event-driven architecture designed for stability and performance:
+To start the agent:
 
-- **`src/gemini_agent/ui/`**: Responsive PyQt6-based interface with real-time terminal and markdown rendering.
-- **`src/gemini_agent/core/`**: The "Brain" of the agent, managing the worker thread, tool registry, and session state.
-- **`src/gemini_agent/config/`**: Centralized configuration management with support for multiple Gemini models and themes.
-- **`conductor/`**: A library of specialized workflow templates for complex task orchestration.
-- **`plugins/`**: Dynamic extension points for third-party or custom integrations.
+```bash
+python run.py
+```
 
----
+## Development
 
-## 📦 Installation
+### Project Structure
+- `src/`: Source code for the agent core.
+- `conductor/`: Orchestration logic.
+- `plugins/`: Extension modules.
+- `tests/`: Unit and integration tests.
 
-### Prerequisites
-- Python 3.10 or higher
-- A Google Gemini API Key ([Get one here](https://aistudio.google.com/app/apikey))
-
-### Setup
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-repo/gemini-ai-agent.git
-   cd gemini-ai-agent
-   ```
-
-2. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv env
-   # On Windows:
-   env\Scripts\activate
-   # On macOS/Linux:
-   source env/bin/activate
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Launch the application:**
-   ```bash
-   python run.py
-   ```
-
----
-
-## 🎮 Usage
-
-### Getting Started
-1. Open **Settings** (⚙️) and enter your **Gemini API Key**.
-2. Select your preferred **Model** (e.g., Gemini 3 Pro).
-3. Use the **Project Explorer** to attach files or directories for context.
-
-### Commands & Shortcuts
-- `/clear`: Reset the current chat session.
-- `/conductor`: Launch the Conductor Orchestrator for complex tasks.
-- `/help`: List all available tools and their descriptions.
-- **Ctrl+Enter**: Send message.
-
----
-
-## 🛠️ Tool Reference (Partial List)
-
-| Category | Tool | Description |
-| :--- | :--- | :--- |
-| **Files** | `read_file`, `write_file` | Basic I/O operations. |
-| **Search** | `search_codebase` | Fast regex search using Ripgrep. |
-| **System** | `run_python`, `start_application` | Execute code or launch apps. |
-| **Git** | `git_operation` | Execute any git command. |
-| **Analysis** | `analyze_python_file` | Static analysis for complexity and issues. |
-| **Dev** | `refactor_code`, `generate_tests` | Automated engineering tasks. |
-
----
-
-## 🧪 Testing
-
-The project includes a comprehensive test suite covering core logic and tool execution.
+### Running Tests
 ```bash
 pytest tests/
 ```
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

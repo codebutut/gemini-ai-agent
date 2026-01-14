@@ -40,6 +40,14 @@ TOOL_REGISTRY: Dict[str, Callable] = {}
 def tool(func: Callable) -> Callable:
     """Decorator to register a function as a tool."""
     TOOL_REGISTRY[func.__name__] = func
+    
+    # MCP Integration: Register tool with FastMCP if available
+    try:
+        from gemini_agent.mcp.server import register_mcp_tool
+        register_mcp_tool(func)
+    except (ImportError, Exception):
+        pass
+        
     return func
 
 # --- Pydantic Models for Validation ---

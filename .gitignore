@@ -1,0 +1,9 @@
+settings.json
+history.json
+__pycache__/
+*.pyc
+.env
+env/
+.checkpoints/
+.ruff_cache/
+.gemini_index_cache.db
