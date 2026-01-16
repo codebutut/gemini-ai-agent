@@ -1,12 +1,12 @@
-import unittest
 import os
 import sys
-from unittest.mock import patch, MagicMock
+import unittest
 
 # Add project root to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.review_engine import ReviewEngine
+
 
 class TestReviewEngine(unittest.TestCase):
     def setUp(self):
@@ -21,10 +21,10 @@ class TestReviewEngine(unittest.TestCase):
         # Code with unused import and missing whitespace
         code = "import os\ndef func(a,b):\n    return a+b"
         issues = self.engine.analyze_code(code)
-        
+
         # If pylint is not installed, we should see the warning message
         if any("pylint not found" in issue for issue in issues):
-            self.assertTrue(True) # Skip check if pylint missing
+            self.assertTrue(True)  # Skip check if pylint missing
         else:
             # Pylint uses different codes. W0611 is unused import.
             # We just check if there are LINT issues found.
@@ -43,5 +43,6 @@ class TestReviewEngine(unittest.TestCase):
         self.assertIn("<pre", html)
         self.assertIn("line2_modified", html)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

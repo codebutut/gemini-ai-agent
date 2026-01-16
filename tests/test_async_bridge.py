@@ -1,7 +1,7 @@
-import unittest
 import asyncio
 import threading
-from concurrent.futures import ThreadPoolExecutor
+import unittest
+
 
 class TestAsyncBridge(unittest.TestCase):
     def test_thread_to_async_callback(self):
@@ -9,9 +9,9 @@ class TestAsyncBridge(unittest.TestCase):
         Verifies that a function running in a thread can synchronously call
         an async function running in the main loop using run_coroutine_threadsafe.
         """
-        
+
         loop = asyncio.new_event_loop()
-        
+
         async def async_target(val):
             await asyncio.sleep(0.01)
             return val * 2
@@ -33,19 +33,21 @@ class TestAsyncBridge(unittest.TestCase):
         # Run the loop in a separate thread to strictly mimic GeminiWorkerThread if needed,
         # but here we can just run the runner in this thread if we are careful.
         # However, to be safe and avoid blocking the test runner if something hangs:
-        
+
         result = None
+
         def target():
             nonlocal result
             result = main_async_runner()
-            
+
         t = threading.Thread(target=target)
         t.start()
         t.join(timeout=2)
-        
+
         self.assertFalse(t.is_alive(), "Thread timed out")
         self.assertEqual(result, 20)
         loop.close()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

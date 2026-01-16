@@ -1,12 +1,13 @@
+import asyncio
 import threading
 import time
-import asyncio
-from typing import Optional
+
 
 class RateLimiter:
     """
     A thread-safe Token Bucket rate limiter with async support.
     """
+
     def __init__(self, max_requests: int, period: float, auto_refill: bool = False):
         """
         Initializes the RateLimiter.
@@ -23,9 +24,9 @@ class RateLimiter:
         self.condition = threading.Condition(self.lock)
         self.auto_refill = auto_refill
         self._stop_event = threading.Event()
-        
+
         # Calculate refill rate
-        self.refill_interval = self.period / self.max_requests
+        self.refill_interval = self.period / self.max_requests if self.max_requests > 0 else self.period
 
         if self.auto_refill:
             self._refill_thread = threading.Thread(target=self._refill_loop, daemon=True)
@@ -44,7 +45,7 @@ class RateLimiter:
         """Stops the refill thread."""
         self._stop_event.set()
 
-    def acquire(self, blocking: bool = True, timeout: Optional[float] = None) -> bool:
+    def acquire(self, blocking: bool = True, timeout: float | None = None) -> bool:
         """
         Attempts to acquire a token (synchronous).
 
@@ -60,7 +61,7 @@ class RateLimiter:
             while self.tokens <= 0:
                 if not blocking:
                     return False
-                
+
                 if timeout is not None:
                     elapsed = time.monotonic() - start_time
                     remaining = timeout - elapsed
@@ -83,11 +84,8 @@ class RateLimiter:
                 if self.tokens > 0:
                     self.tokens -= 1
                     return True
-            
+
             # Wait for a bit before retrying if no tokens available
-            # This is a simple polling approach. A more complex one would use asyncio.Condition
-            # but that requires the refill to happen in the same loop or use call_soon_threadsafe.
-            # Given the refill_interval, this is acceptable.
             await asyncio.sleep(self.refill_interval / 2)
 
     def release(self) -> None:
@@ -100,3 +98,12 @@ class RateLimiter:
         """Returns the number of remaining tokens."""
         with self.lock:
             return self.tokens
+
+    def update_limits(self, remaining: int, limit: int) -> None:
+        """Updates the rate limiter state from external telemetry."""
+        with self.condition:
+            self.tokens = remaining
+            self.max_requests = limit
+            # Recalculate refill interval if limit changed
+            self.refill_interval = self.period / self.max_requests if self.max_requests > 0 else self.period
+            self.condition.notify_all()

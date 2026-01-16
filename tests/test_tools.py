@@ -1,13 +1,14 @@
-import unittest
 import os
+import shutil
 import sys
 import tempfile
-import shutil
+import unittest
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from core.tools import list_files, read_file, write_file, run_python
+from core.tools import list_files, read_file, run_python, write_file
+
 
 class TestFileTools(unittest.TestCase):
     def setUp(self):
@@ -33,6 +34,7 @@ class TestFileTools(unittest.TestCase):
         self.assertIn("Successfully wrote", result)
         self.assertEqual(read_file(new_file), "New Content")
 
+
 class TestPythonExecution(unittest.TestCase):
     def test_run_python_simple(self):
         code = "print('Hello from Python')"
@@ -44,5 +46,6 @@ class TestPythonExecution(unittest.TestCase):
         result = run_python(code)
         self.assertIn("ValueError: Oops", result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

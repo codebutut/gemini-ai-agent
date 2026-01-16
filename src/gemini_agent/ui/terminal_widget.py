@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPlainTextEdit, QHBoxLayout, QPushButton, QLabel
-from PyQt6.QtCore import pyqtSignal, Qt
-from PyQt6.QtGui import QTextCursor, QColor, QTextCharFormat, QFont
+from PyQt6.QtGui import QColor, QTextCharFormat, QTextCursor
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QPlainTextEdit, QPushButton, QVBoxLayout, QWidget
+
 
 class TerminalWidget(QWidget):
     def __init__(self, parent=None):
@@ -17,16 +17,18 @@ class TerminalWidget(QWidget):
         toolbar.setStyleSheet("background-color: #222; border-bottom: 1px solid #333;")
         toolbar_layout = QHBoxLayout(toolbar)
         toolbar_layout.setContentsMargins(10, 2, 10, 2)
-        
+
         title = QLabel("TERMINAL")
         title.setStyleSheet("color: #888; font-weight: bold; font-size: 10px;")
         toolbar_layout.addWidget(title)
-        
+
         toolbar_layout.addStretch()
-        
+
         self.btn_clear = QPushButton("Clear")
         self.btn_clear.setFixedWidth(50)
-        self.btn_clear.setStyleSheet("QPushButton { background: transparent; color: #888; border: none; font-size: 10px; } QPushButton:hover { color: #EEE; }")
+        self.btn_clear.setStyleSheet(
+            "QPushButton { background: transparent; color: #888; border: none; font-size: 10px; } QPushButton:hover { color: #EEE; }"
+        )
         self.btn_clear.clicked.connect(self.clear)
         toolbar_layout.addWidget(self.btn_clear)
 
@@ -49,14 +51,14 @@ class TerminalWidget(QWidget):
     def append_text(self, text: str, color: str = None):
         cursor = self.output.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.End)
-        
+
         if color:
             fmt = QTextCharFormat()
             fmt.setForeground(QColor(color))
             cursor.setCharFormat(fmt)
         else:
-            cursor.setCharFormat(QTextCharFormat()) # Reset to default
-            
+            cursor.setCharFormat(QTextCharFormat())  # Reset to default
+
         cursor.insertText(text)
         self.output.setTextCursor(cursor)
         self.output.ensureCursorVisible()

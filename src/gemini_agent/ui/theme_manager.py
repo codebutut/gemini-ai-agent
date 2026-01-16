@@ -1,13 +1,14 @@
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QPalette, QColor
-from PyQt6.QtCore import Qt
 import logging
+
+from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtWidgets import QApplication
+
 
 class ThemeManager:
     """
     Manages application themes and custom CSS overrides.
     """
-    
+
     DARK_PALETTE = {
         "Window": "#131314",
         "WindowText": "#E3E3E3",
@@ -48,6 +49,18 @@ class ThemeManager:
     QLabel { color: #E3E3E3; }
     QPushButton#BtnNewChat { background-color: #1E1F20; color: #E3E3E3; border-radius: 15px; font-weight: bold; padding: 12px; text-align: left; padding-left: 20px; border: none; }
     QPushButton#BtnNewChat:hover { background-color: #2D2E30; }
+    
+    QPushButton#BtnTerminal, QPushButton#BtnSettings { 
+        background-color: #1E1F20; 
+        color: #E3E3E3; 
+        border-radius: 16px; 
+        padding: 0px 15px; 
+        border: 1px solid #333;
+        font-size: 12px;
+    }
+    QPushButton#BtnTerminal:hover, QPushButton#BtnSettings:hover { background-color: #2D2E30; }
+    QPushButton#BtnTerminal:checked { background-color: #004A77; color: #C2E7FF; }
+
     QFrame#Sidebar { background-color: #1E1F20; border-right: none; }
     QFrame#SidebarContainer { background-color: #1E1F20; border-right: 1px solid #333; }
     QTabWidget::pane { border: none; }
@@ -68,6 +81,18 @@ class ThemeManager:
     QLabel { color: #1F1F1F; }
     QPushButton#BtnNewChat { background-color: #D3E3FD; color: #041E49; border-radius: 15px; font-weight: bold; padding: 12px; text-align: left; padding-left: 20px; border: none; }
     QPushButton#BtnNewChat:hover { background-color: #C2E7FF; }
+
+    QPushButton#BtnTerminal, QPushButton#BtnSettings { 
+        background-color: #F0F4F9; 
+        color: #1F1F1F; 
+        border-radius: 16px; 
+        padding: 0px 15px; 
+        border: 1px solid #DDD;
+        font-size: 12px;
+    }
+    QPushButton#BtnTerminal:hover, QPushButton#BtnSettings:hover { background-color: #E0E0E0; }
+    QPushButton#BtnTerminal:checked { background-color: #D3E3FD; color: #041E49; }
+
     QFrame#Sidebar { background-color: #F0F4F9; border-right: none; }
     QFrame#SidebarContainer { background-color: #F0F4F9; border-right: 1px solid #DDD; }
     QTabWidget::pane { border: none; }
@@ -88,15 +113,15 @@ class ThemeManager:
         """Applies the specified theme to the application."""
         self.current_theme = theme_name
         palette = QPalette()
-        
+
         theme_data = self.DARK_PALETTE if theme_name == "Dark" else self.LIGHT_PALETTE
-        
+
         for role_name, color_hex in theme_data.items():
             role = getattr(QPalette.ColorRole, role_name)
             palette.setColor(role, QColor(color_hex))
-            
+
         self.app.setPalette(palette)
-        
+
         style = self.DARK_STYLE if theme_name == "Dark" else self.LIGHT_STYLE
         self.app.setStyleSheet(style)
         logging.info(f"Applied theme: {theme_name}")

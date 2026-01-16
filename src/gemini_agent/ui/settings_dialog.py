@@ -1,21 +1,39 @@
-from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QLabel, 
-    QComboBox, QLineEdit, QCheckBox, QGroupBox, QSpinBox, QDoubleSpinBox, 
-    QTextEdit, QPushButton, QFrame, QMessageBox, QFileDialog, QListWidget,
-    QListWidgetItem
-)
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QDoubleSpinBox,
+    QFileDialog,
+    QFrame,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QSpinBox,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
 from gemini_agent.config.app_config import AppConfig, ModelRegistry, save_json
+
 
 class SettingsDialog(QDialog):
     """
     Modal dialog for application settings with scrollable content.
     """
+
     def __init__(self, parent, config):
         super().__init__(parent)
         self.main_window = parent
         self.config = config
-        self.checkpoint_manager = getattr(parent, 'checkpoint_manager', None)
+        self.checkpoint_manager = getattr(parent, "checkpoint_manager", None)
         self.setWindowTitle("Settings")
         self.setMinimumWidth(550)
         self.setMinimumHeight(500)
@@ -36,13 +54,13 @@ class SettingsDialog(QDialog):
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
-        
+
         # Create container widget for scroll area
         self.scroll_widget = QWidget()
         self.scroll_layout = QVBoxLayout(self.scroll_widget)
         self.scroll_layout.setSpacing(15)
         self.scroll_layout.setContentsMargins(20, 20, 20, 20)
-        
+
         # 1. Model Selection
         self.scroll_layout.addWidget(QLabel("Gemini Model:"))
         self.model_combo = QComboBox()
@@ -62,7 +80,9 @@ class SettingsDialog(QDialog):
         self.model_combo.currentIndexChanged.connect(self.save_general_settings)
         self.scroll_layout.addWidget(self.model_combo)
 
-        model_info = QLabel("💡 Gemini 3 Series: Advanced reasoning | Gemini 2.5 Series: Current stable | Flash: Fast & efficient")
+        model_info = QLabel(
+            "💡 Gemini 3 Series: Advanced reasoning | Gemini 2.5 Series: Current stable | Flash: Fast & efficient"
+        )
         model_info.setStyleSheet("color: #888; font-size: 11px; font-style: italic;")
         self.scroll_layout.addWidget(model_info)
 
@@ -96,7 +116,7 @@ class SettingsDialog(QDialog):
         if self.checkpoint_manager:
             checkpoint_group = QGroupBox("Project Checkpointing")
             checkpoint_layout = QVBoxLayout()
-            
+
             checkpoint_layout.addWidget(QLabel("Create New Checkpoint:"))
             create_layout = QHBoxLayout()
             self.checkpoint_name_input = QLineEdit()
@@ -106,12 +126,12 @@ class SettingsDialog(QDialog):
             create_layout.addWidget(self.checkpoint_name_input)
             create_layout.addWidget(self.btn_create_checkpoint)
             checkpoint_layout.addLayout(create_layout)
-            
+
             checkpoint_layout.addWidget(QLabel("Existing Checkpoints:"))
             self.checkpoint_list = QListWidget()
             self.checkpoint_list.setFixedHeight(150)
             checkpoint_layout.addWidget(self.checkpoint_list)
-            
+
             btn_layout = QHBoxLayout()
             self.btn_restore_checkpoint = QPushButton("Restore Selected")
             self.btn_restore_checkpoint.clicked.connect(self.restore_checkpoint)
@@ -120,7 +140,7 @@ class SettingsDialog(QDialog):
             btn_layout.addWidget(self.btn_restore_checkpoint)
             btn_layout.addWidget(self.btn_delete_checkpoint)
             checkpoint_layout.addLayout(btn_layout)
-            
+
             checkpoint_group.setLayout(checkpoint_layout)
             self.scroll_layout.addWidget(checkpoint_group)
 
@@ -211,7 +231,7 @@ class SettingsDialog(QDialog):
         self.scroll_layout.addStretch(1)
         self.scroll_area.setWidget(self.scroll_widget)
         main_layout.addWidget(self.scroll_area)
-        
+
         bottom_frame = QFrame()
         bottom_layout = QHBoxLayout(bottom_frame)
         bottom_layout.setContentsMargins(20, 10, 20, 20)
@@ -228,7 +248,7 @@ class SettingsDialog(QDialog):
         checkpoints = self.checkpoint_manager.list_checkpoints()
         for cp in reversed(checkpoints):
             item = QListWidgetItem(f"{cp['name']} ({cp['timestamp'][:19].replace('T', ' ')})")
-            item.setData(Qt.ItemDataRole.UserRole, cp['id'])
+            item.setData(Qt.ItemDataRole.UserRole, cp["id"])
             self.checkpoint_list.addItem(item)
 
     def create_checkpoint(self):
@@ -236,7 +256,7 @@ class SettingsDialog(QDialog):
         if not name:
             QMessageBox.warning(self, "Warning", "Please enter a name for the checkpoint.")
             return
-        
+
         cp = self.checkpoint_manager.create_checkpoint(name)
         if cp:
             QMessageBox.information(self, "Success", f"Checkpoint '{name}' created successfully.")
@@ -250,18 +270,25 @@ class SettingsDialog(QDialog):
         if not selected_item:
             QMessageBox.warning(self, "Warning", "Please select a checkpoint to restore.")
             return
-        
+
         checkpoint_id = selected_item.data(Qt.ItemDataRole.UserRole)
         checkpoint_name = selected_item.text()
-        
-        reply = QMessageBox.question(self, "Restore Checkpoint", 
-                                   f"Are you sure you want to restore '{checkpoint_name}'?\n\n"
-                                   "This will overwrite current project files. A safety backup will be created.",
-                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        
+
+        reply = QMessageBox.question(
+            self,
+            "Restore Checkpoint",
+            f"Are you sure you want to restore '{checkpoint_name}'?\n\n"
+            "This will overwrite current project files. A safety backup will be created.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+
         if reply == QMessageBox.StandardButton.Yes:
             if self.checkpoint_manager.restore_checkpoint(checkpoint_id):
-                QMessageBox.information(self, "Success", "Project restored successfully. The application will now close to apply changes.")
+                QMessageBox.information(
+                    self,
+                    "Success",
+                    "Project restored successfully. The application will now close to apply changes.",
+                )
                 self.main_window.close()
             else:
                 QMessageBox.critical(self, "Error", "Failed to restore checkpoint.")
@@ -271,14 +298,17 @@ class SettingsDialog(QDialog):
         if not selected_item:
             QMessageBox.warning(self, "Warning", "Please select a checkpoint to delete.")
             return
-        
+
         checkpoint_id = selected_item.data(Qt.ItemDataRole.UserRole)
         checkpoint_name = selected_item.text()
-        
-        reply = QMessageBox.question(self, "Delete Checkpoint", 
-                                   f"Are you sure you want to delete '{checkpoint_name}'?",
-                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        
+
+        reply = QMessageBox.question(
+            self,
+            "Delete Checkpoint",
+            f"Are you sure you want to delete '{checkpoint_name}'?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+
         if reply == QMessageBox.StandardButton.Yes:
             if self.checkpoint_manager.delete_checkpoint(checkpoint_id):
                 self.refresh_checkpoints()
@@ -286,17 +316,21 @@ class SettingsDialog(QDialog):
                 QMessageBox.critical(self, "Error", "Failed to delete checkpoint.")
 
     def browse_conductor_path(self):
-        path = QFileDialog.getExistingDirectory(self, "Select Conductor Extension Directory", self.conductor_path_input.text())
+        path = QFileDialog.getExistingDirectory(
+            self, "Select Conductor Extension Directory", self.conductor_path_input.text()
+        )
         if path:
             self.conductor_path_input.setText(path)
             self.config["conductor_path"] = path
             save_json(AppConfig.CONFIG_FILE, self.config)
-            if hasattr(self.main_window, 'conductor_manager'):
+            if hasattr(self.main_window, "conductor_manager"):
                 from gemini_agent.core.conductor_manager import ConductorManager
+
                 self.main_window.conductor_manager = ConductorManager(extension_path=path)
 
     def open_conductor_dialog(self):
         from gemini_agent.ui.conductor_dialog import ConductorDialog
+
         dialog = ConductorDialog(self.main_window, self.main_window.conductor_manager)
         dialog.exec()
 
@@ -338,7 +372,7 @@ class SettingsDialog(QDialog):
         fg = "#E3E3E3" if is_dark else "#000000"
         input_bg = "#282A2C" if is_dark else "#F0F0F0"
         scroll_bg = "#1A1A1A" if is_dark else "#F5F5F5"
-        
+
         self.setStyleSheet(f"""
             QDialog {{ background-color: {bg}; color: {fg}; }} 
             QLabel, QCheckBox, QGroupBox {{ color: {fg}; }}
@@ -346,16 +380,16 @@ class SettingsDialog(QDialog):
                 background-color: {input_bg}; color: {fg}; border: 1px solid #444; padding: 5px;
             }}
             QPushButton {{
-                background-color: {'#2D2E30' if is_dark else '#E0E0E0'};
+                background-color: {"#2D2E30" if is_dark else "#E0E0E0"};
                 color: {fg};
-                border: 1px solid {'#444' if is_dark else '#CCC'};
+                border: 1px solid {"#444" if is_dark else "#CCC"};
                 border-radius: 4px;
                 padding: 8px 16px;
             }}
-            QPushButton:hover {{ background-color: {'#3C4043' if is_dark else '#D0D0D0'}; }}
+            QPushButton:hover {{ background-color: {"#3C4043" if is_dark else "#D0D0D0"}; }}
             QGroupBox {{
                 font-weight: bold;
-                border: 1px solid {'#444' if is_dark else '#CCC'};
+                border: 1px solid {"#444" if is_dark else "#CCC"};
                 border-radius: 5px;
                 margin-top: 10px;
                 padding-top: 10px;
@@ -364,17 +398,17 @@ class SettingsDialog(QDialog):
             QScrollArea {{ background-color: {scroll_bg}; border: none; }}
             QScrollArea > QWidget > QWidget {{ background-color: {scroll_bg}; }}
         """)
-        
+
         btn_primary_style = f"""
             QPushButton {{
-                background-color: {'#0B57D0' if is_dark else '#1A73E8'};
+                background-color: {"#0B57D0" if is_dark else "#1A73E8"};
                 color: white;
                 border: none;
                 padding: 8px 16px;
                 border-radius: 4px;
                 font-weight: bold;
             }}
-            QPushButton:hover {{ background-color: {'#1C71D8' if is_dark else '#1669D6'}; }}
+            QPushButton:hover {{ background-color: {"#1C71D8" if is_dark else "#1669D6"}; }}
         """
         self.btn_save_params.setStyleSheet(btn_primary_style)
         self.btn_save_sys.setStyleSheet(btn_primary_style)

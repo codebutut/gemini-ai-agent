@@ -1,19 +1,21 @@
-import os
-import tomllib
 import logging
 from pathlib import Path
-from typing import Dict, Optional, List, Any
+from typing import Any
+
+import tomllib
+
 
 class ConductorManager:
     """
     Manages Conductor commands and templates.
     """
-    def __init__(self, extension_path: Optional[str] = None) -> None:
+
+    def __init__(self, extension_path: str | None = None) -> None:
         """
         Initializes the ConductorManager.
 
         Args:
-            extension_path: Optional path to the conductor extension. 
+            extension_path: Optional path to the conductor extension.
                              Defaults to a 'conductor' directory sibling to 'core'.
         """
         # Use provided path if it exists, otherwise fallback to default project structure
@@ -24,10 +26,10 @@ class ConductorManager:
             # Path(__file__) is src/gemini_agent/core/conductor_manager.py
             # .parent.parent.parent.parent is the project root
             self.extension_path = Path(__file__).resolve().parent.parent.parent.parent / "conductor"
-            
+
         self.commands_path: Path = self.extension_path / "commands" / "conductor"
         self.templates_path: Path = self.extension_path / "templates"
-        self.commands: Dict[str, Dict[str, Any]] = {}
+        self.commands: dict[str, dict[str, Any]] = {}
         self._load_commands()
 
     def _load_commands(self) -> None:
@@ -35,7 +37,7 @@ class ConductorManager:
         if not self.commands_path.exists():
             logging.warning(f"Conductor commands path does not exist: {self.commands_path}")
             return
-        
+
         for toml_file in self.commands_path.glob("*.toml"):
             try:
                 with open(toml_file, "rb") as f:
@@ -44,7 +46,7 @@ class ConductorManager:
             except (tomllib.TOMLDecodeError, OSError) as e:
                 logging.error(f"Error loading conductor command {toml_file}: {e}")
 
-    def get_command_prompt(self, command_name: str) -> Optional[str]:
+    def get_command_prompt(self, command_name: str) -> str | None:
         """
         Returns the system prompt for a given command.
 
@@ -59,7 +61,7 @@ class ConductorManager:
             return command.get("prompt")
         return None
 
-    def get_available_commands(self) -> List[str]:
+    def get_available_commands(self) -> list[str]:
         """
         Returns a list of available command names.
 
@@ -82,7 +84,7 @@ class ConductorManager:
         required_files = ["product.md", "tech-stack.md", "workflow.md"]
         return conductor_dir.exists() and all((conductor_dir / f).exists() for f in required_files)
 
-    def get_setup_state(self, project_path: str = ".") -> Optional[Dict[str, Any]]:
+    def get_setup_state(self, project_path: str = ".") -> dict[str, Any] | None:
         """
         Loads the setup state from the project's conductor directory.
 
@@ -95,8 +97,9 @@ class ConductorManager:
         state_file = Path(project_path) / "conductor" / "setup_state.json"
         if state_file.exists():
             import json
+
             try:
-                with open(state_file, "r") as f:
+                with open(state_file) as f:
                     return json.load(f)
             except (json.JSONDecodeError, OSError) as e:
                 logging.error(f"Error loading setup state from {state_file}: {e}")

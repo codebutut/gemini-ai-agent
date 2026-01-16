@@ -1,10 +1,11 @@
+import shutil
+import tempfile
 import unittest
-import json
 import zipfile
 from pathlib import Path
-import tempfile
-import shutil
+
 from core.exporter import Exporter
+
 
 class TestExporter(unittest.TestCase):
     def setUp(self):
@@ -16,8 +17,8 @@ class TestExporter(unittest.TestCase):
             "specs": "Test Specs",
             "messages": [
                 {"role": "user", "text": "Hello", "timestamp": "2023-10-27T10:01:00"},
-                {"role": "model", "text": "Hi there!", "timestamp": "2023-10-27T10:01:05"}
-            ]
+                {"role": "model", "text": "Hi there!", "timestamp": "2023-10-27T10:01:05"},
+            ],
         }
 
     def tearDown(self):
@@ -48,8 +49,8 @@ class TestExporter(unittest.TestCase):
         success = Exporter.create_backup(sessions, backup_path)
         self.assertTrue(success)
         self.assertTrue(backup_path.exists())
-        
-        with zipfile.ZipFile(backup_path, 'r') as zipf:
+
+        with zipfile.ZipFile(backup_path, "r") as zipf:
             self.assertIn("history.json", zipf.namelist())
             self.assertIn("sessions/Test_Session_sess1.md", zipf.namelist())
 
@@ -57,9 +58,10 @@ class TestExporter(unittest.TestCase):
         sessions = {"sess1": self.session_data}
         backup_path = self.test_dir / "backup.zip"
         Exporter.create_backup(sessions, backup_path)
-        
+
         restored = Exporter.restore_backup(backup_path)
         self.assertEqual(restored["sess1"]["title"], "Test Session")
+
 
 if __name__ == "__main__":
     unittest.main()

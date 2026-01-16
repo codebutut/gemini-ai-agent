@@ -1,7 +1,10 @@
 import inspect
 import re
-from typing import Any, Dict, List, Union, Callable, Optional
+from collections.abc import Callable
+from typing import Any, Union
+
 from google.genai import types
+
 
 def get_type_map(python_type: Any) -> types.Type:
     """Maps Python types to Gemini API types."""
@@ -15,9 +18,9 @@ def get_type_map(python_type: Any) -> types.Type:
     }
     # Handle generic types and Union/Optional
     origin = getattr(python_type, "__origin__", None)
-    if origin in (list, List):
+    if origin in (list, list):
         return types.Type.ARRAY
-    if origin in (dict, Dict):
+    if origin in (dict, dict):
         return types.Type.OBJECT
     if origin is Union:
         args = getattr(python_type, "__args__", [])
@@ -28,14 +31,15 @@ def get_type_map(python_type: Any) -> types.Type:
 
     return mapping.get(python_type, types.Type.STRING)
 
+
 def auto_generate_declaration(func: Callable) -> types.FunctionDeclaration:
     """Automatically generates a FunctionDeclaration from a Python function."""
     sig = inspect.signature(func)
     doc = inspect.getdoc(func) or "No description provided."
-    
+
     # Parse parameter descriptions from docstring (simple version)
     param_docs = {}
-    doc_lines = doc.split('\n')
+    doc_lines = doc.split("\n")
     current_param = None
     for line in doc_lines:
         line = line.strip()
@@ -47,10 +51,10 @@ def auto_generate_declaration(func: Callable) -> types.FunctionDeclaration:
             param_docs[current_param] = match.group(2)
         elif current_param and line:
             param_docs[current_param] += " " + line
-            
+
     properties = {}
     required = []
-    
+
     def unwrap(t):
         orig = getattr(t, "__origin__", None)
         if orig is Union:
@@ -61,42 +65,35 @@ def auto_generate_declaration(func: Callable) -> types.FunctionDeclaration:
 
     for name, param in sig.parameters.items():
         # Skip self/cls if any (though not expected here)
-        if name in ('self', 'cls'):
+        if name in ("self", "cls"):
             continue
-            
+
         param_type = get_type_map(param.annotation)
-        
+
         schema_args = {"type": param_type}
-        if name in param_docs:
-            schema_args["description"] = param_docs[name]
-        else:
-            schema_args["description"] = f"Parameter {name}"
-            
+        schema_args["description"] = param_docs.get(name, f"Parameter {name}")
+
         # Handle arrays
         if param_type == types.Type.ARRAY:
             # Try to guess item type from annotation
             item_type = types.Type.STRING
-            
+
             unwrapped = unwrap(param.annotation)
             orig = getattr(unwrapped, "__origin__", None)
-            if orig in (list, List):
+            if orig in (list, list):
                 inner_args = getattr(unwrapped, "__args__", [])
                 if inner_args:
                     item_type = get_type_map(inner_args[0])
-            
+
             schema_args["items"] = types.Schema(type=item_type)
-            
+
         properties[name] = types.Schema(**schema_args)
-        
+
         if param.default is inspect.Parameter.empty:
             required.append(name)
-            
+
     return types.FunctionDeclaration(
         name=func.__name__,
         description=doc_lines[0] if doc_lines else "No description",
-        parameters=types.Schema(
-            type=types.Type.OBJECT,
-            properties=properties,
-            required=required
-        )
+        parameters=types.Schema(type=types.Type.OBJECT, properties=properties, required=required),
     )

@@ -2,15 +2,16 @@ import logging
 import mimetypes
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Union, Optional
+
 from google import genai
 from google.genai import types
+
 
 class ContextManager:
     """
     Handles preparation of history and current turn content for the Gemini API.
     """
-    
+
     # Default prompt engineering flags to be appended to every user prompt
     DEFAULT_FLAGS = "--gemini --prompt-engineering --clarity --precision --structure --measurable-outcomes --actionable-details --professional-terminology --concise-keywords  "
 
@@ -18,29 +19,20 @@ class ContextManager:
         self.client = client
         mimetypes.init()
 
-    def prepare_history(self, history_context: List[Dict[str, str]]) -> List[types.Content]:
+    def prepare_history(self, history_context: list[dict[str, str]]) -> list[types.Content]:
         """Convert simplified history to proper types.Content objects."""
         gemini_contents = []
         for msg in history_context:
             role = "user" if msg["role"] == "user" else "model"
-            gemini_contents.append(
-                types.Content(
-                    role=role,
-                    parts=[types.Part.from_text(text=msg["text"])]
-                )
-            )
+            gemini_contents.append(types.Content(role=role, parts=[types.Part.from_text(text=msg["text"])]))
         return gemini_contents
 
     def prepare_current_turn(
-        self, 
-        prompt: str, 
-        file_paths: List[str], 
-        current_plan: str = "", 
-        current_specs: str = ""
-    ) -> List[types.Part]:
+        self, prompt: str, file_paths: list[str], current_plan: str = "", current_specs: str = ""
+    ) -> list[types.Part]:
         """Prepare parts for the current turn, including files and prompt."""
         current_turn_parts = []
-        
+
         # Inject session-specific plan and specs if they exist
         if current_plan:
             current_turn_parts.append(types.Part.from_text(text=f"Current plan.md:\n{current_plan}"))
@@ -57,20 +49,20 @@ class ContextManager:
         # Ensure prompt is not empty and contains the default flags
         if not prompt:
             prompt = "[System: No user prompt provided, follow default instructions.]"
-            
+
         if self.DEFAULT_FLAGS.strip() not in prompt:
             prompt = f"{prompt}\n\n{self.DEFAULT_FLAGS}"
-            
+
         current_turn_parts.append(types.Part.from_text(text=prompt))
         return current_turn_parts
 
-    def _load_file_content(self, file_path: str) -> Union[types.Part, str]:
+    def _load_file_content(self, file_path: str) -> types.Part | str:
         """
         Loads file content, handling images/PDFs via upload and text directly.
         """
         path = Path(file_path)
         mime_type, _ = mimetypes.guess_type(path)
-        
+
         if not mime_type:
             mime_type = "application/octet-stream"
 
@@ -82,19 +74,16 @@ class ContextManager:
                 while uploaded_file.state.name == "PROCESSING":
                     time.sleep(1)
                     uploaded_file = self.client.files.get(name=uploaded_file.name)
-                
-                return types.Part.from_uri(
-                    file_uri=uploaded_file.uri,
-                    mime_type=uploaded_file.mime_type
-                )
+
+                return types.Part.from_uri(file_uri=uploaded_file.uri, mime_type=uploaded_file.mime_type)
             except Exception as e:
                 logging.error(f"Failed to upload file {path}: {e}")
                 return f"[Error uploading {path.name}: {e}]"
-        
+
         # Text/Code files -> Read content directly
         else:
             try:
-                with open(path, "r", encoding="utf-8", errors="replace") as f:
+                with open(path, encoding="utf-8", errors="replace") as f:
                     text_content = f.read()
                 return types.Part.from_text(text=f"File: {path.name}\nContent:\n{text_content}")
             except Exception as e:

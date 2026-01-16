@@ -1,16 +1,22 @@
 import os
+
+from PyQt6.QtCore import QDir, Qt, pyqtSignal
+from PyQt6.QtGui import QAction, QFileSystemModel
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QTreeView, QHeaderView, 
-    QMenu, QMessageBox, QLineEdit
+    QLineEdit,
+    QMenu,
+    QTreeView,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt6.QtGui import QFileSystemModel, QAction, QCursor
-from PyQt6.QtCore import Qt, pyqtSignal, QDir
+
 
 class ProjectExplorer(QWidget):
     """
-    A widget that displays the project file structure and allows 
+    A widget that displays the project file structure and allows
     attaching files/folders to the chat.
     """
+
     file_attached = pyqtSignal(str)
     folder_attached = pyqtSignal(str)
     file_opened = pyqtSignal(str)
@@ -46,26 +52,26 @@ class ProjectExplorer(QWidget):
         self.model = QFileSystemModel()
         self.model.setRootPath(self.root_path)
         self.model.setFilter(QDir.Filter.AllEntries | QDir.Filter.NoDotAndDotDot)
-        
+
         # Tree View
         self.tree = QTreeView()
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.root_path))
-        
+
         # Hide columns except Name
         for i in range(1, self.model.columnCount()):
             self.tree.hideColumn(i)
-            
+
         self.tree.header().hide()
         self.tree.setAnimated(True)
         self.tree.setIndentation(20)
         self.tree.setSortingEnabled(True)
         self.tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-        
+
         self.tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tree.customContextMenuRequested.connect(self.show_context_menu)
         self.tree.doubleClicked.connect(self.on_double_clicked)
-        
+
         layout.addWidget(self.tree)
 
     def filter_files(self, text):
@@ -85,18 +91,18 @@ class ProjectExplorer(QWidget):
         is_dir = self.model.isDir(index)
 
         menu = QMenu()
-        
+
         attach_action = QAction(f"📎 Attach {'Folder' if is_dir else 'File'}", self)
         attach_action.triggered.connect(lambda: self.emit_attach(path, is_dir))
         menu.addAction(attach_action)
-        
+
         if not is_dir:
             open_action = QAction("📖 Open in Editor", self)
             open_action.triggered.connect(lambda: self.file_opened.emit(path))
             menu.addAction(open_action)
-            
+
         menu.addSeparator()
-        
+
         copy_path_action = QAction("📋 Copy Path", self)
         copy_path_action.triggered.connect(lambda: self.copy_to_clipboard(path))
         menu.addAction(copy_path_action)
@@ -116,6 +122,7 @@ class ProjectExplorer(QWidget):
 
     def copy_to_clipboard(self, text):
         from PyQt6.QtWidgets import QApplication
+
         QApplication.clipboard().setText(text)
 
     def apply_theme(self, theme_mode: str):
@@ -123,10 +130,10 @@ class ProjectExplorer(QWidget):
         bg = "#1E1F20" if is_dark else "#FFFFFF"
         fg = "#E3E3E3" if is_dark else "#000000"
         input_bg = "#2d2d2d" if is_dark else "#F0F0F0"
-        
+
         self.filter_input.setStyleSheet(f"""
             QLineEdit {{
-                border: 1px solid {'#444' if is_dark else '#CCC'};
+                border: 1px solid {"#444" if is_dark else "#CCC"};
                 border-radius: 4px;
                 padding: 4px;
                 background-color: {input_bg};
@@ -135,7 +142,7 @@ class ProjectExplorer(QWidget):
             }}
             QLineEdit:focus {{ border: 1px solid #0B57D0; }}
         """)
-        
+
         self.tree.setStyleSheet(f"""
             QTreeView {{
                 background-color: {bg};
@@ -143,10 +150,10 @@ class ProjectExplorer(QWidget):
                 border: none;
             }}
             QTreeView::item:hover {{
-                background-color: {'#333' if is_dark else '#F0F0F0'};
+                background-color: {"#333" if is_dark else "#F0F0F0"};
             }}
             QTreeView::item:selected {{
-                background-color: {'#0B57D0' if is_dark else '#E8F0FE'};
-                color: {'white' if is_dark else '#0B57D0'};
+                background-color: {"#0B57D0" if is_dark else "#E8F0FE"};
+                color: {"white" if is_dark else "#0B57D0"};
             }}
         """)

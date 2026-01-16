@@ -1,1 +1,1 @@
-from .helpers import RateLimiter
+from .helpers import RateLimiter as RateLimiter

@@ -1,99 +1,140 @@
-import sys
+import argparse
+import asyncio
+import contextlib
+import json
+import logging
+import multiprocessing
 import os
+import sys
 import threading
-from typing import Optional, Dict, Any
 from pathlib import Path
+from typing import Any
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                             QPushButton, QLabel, QMessageBox, QFileDialog, QScrollArea, 
-                             QFrame, QListWidgetItem, QSplitter, QMenu, QInputDialog, 
-                             QDialog, QDockWidget) 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QMetaObject, Q_ARG
+from PyQt6.QtCore import Q_ARG, QMetaObject, QObject, Qt, pyqtSignal
+from PyQt6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QDockWidget,
+    QFileDialog,
+    QFrame,
+    QHBoxLayout,
+    QInputDialog,
+    QLabel,
+    QListWidgetItem,
+    QMainWindow,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QSplitter,
+    QVBoxLayout,
+    QWidget,
+)
+from qasync import QEventLoop, asyncSlot
 
-from gemini_agent.config.app_config import AppConfig, ModelRegistry, Theme, Role, setup_logging
-from gemini_agent.ui.widgets import MessageBubble, AutoResizingTextEdit, AttachmentItem
-from gemini_agent.core.worker import GeminiWorker, GeminiWorkerThread, WorkerConfig
-from gemini_agent.core.session_manager import SessionManager
-from gemini_agent.core.tools import TOOL_REGISTRY
+from gemini_agent.config.app_config import AppConfig, ModelRegistry, Role, Theme, setup_logging
 from gemini_agent.core.attachment_manager import AttachmentManager
+from gemini_agent.core.checkpoint_manager import CheckpointManager
 from gemini_agent.core.conductor_manager import ConductorManager
 from gemini_agent.core.exporter import Exporter
+from gemini_agent.core.extension_manager import ExtensionManager
 from gemini_agent.core.indexer import Indexer
-from gemini_agent.core.plugins import PluginManager
-from gemini_agent.core.checkpoint_manager import CheckpointManager
-from gemini_agent.ui.settings_dialog import SettingsDialog
-from gemini_agent.ui.deep_review import DeepReviewDialog
-from gemini_agent.ui.components import SidebarContainer, ChatHeader
-from gemini_agent.ui.status_widget import StatusWidget
-from gemini_agent.ui.project_explorer import ProjectExplorer
-from gemini_agent.ui.symbol_browser import SymbolBrowser
-from gemini_agent.ui.theme_manager import ThemeManager
-from gemini_agent.ui.plugin_dialog import PluginDialog
-from gemini_agent.ui.terminal_widget import TerminalWidget
+from gemini_agent.core.recent_manager import RecentManager
+from gemini_agent.core.session_manager import SessionManager
+from gemini_agent.core.tools import TOOL_REGISTRY
+from gemini_agent.core.vector_store import VectorStore
+from gemini_agent.core.worker import GeminiWorker, GeminiWorkerThread, WorkerConfig
+from gemini_agent.ui.components import ChatHeader, SidebarContainer
 from gemini_agent.ui.conductor_dialog import ConductorDialog
+from gemini_agent.ui.deep_review import DeepReviewDialog
+from gemini_agent.ui.plugin_dialog import PluginDialog
+from gemini_agent.ui.project_explorer import ProjectExplorer
+from gemini_agent.ui.settings_dialog import SettingsDialog
+from gemini_agent.ui.status_widget import StatusWidget
+from gemini_agent.ui.symbol_browser import SymbolBrowser
+from gemini_agent.ui.terminal_widget import TerminalWidget
+from gemini_agent.ui.theme_manager import ThemeManager
+from gemini_agent.ui.widgets import AttachmentItem, AutoResizingTextEdit, MessageBubble
+
+logger = logging.getLogger(__name__)
+
 
 class ChatController(QObject):
     """
     Controller handling the business logic of the chat application.
     Separates UI from gemini_agent.core logic and worker coordination.
     """
+
     status_updated = pyqtSignal(str)
     response_received = pyqtSignal(str)
     error_occurred = pyqtSignal(str)
     usage_updated = pyqtSignal(str, int, int)
+    rate_limit_updated = pyqtSignal(str, int, int)
     terminal_output = pyqtSignal(str, str)
     tool_confirmation_requested = pyqtSignal(str, dict, str)
 
-    def __init__(self, app_config: AppConfig, session_manager: SessionManager, 
-                 attachment_manager: AttachmentManager, conductor_manager: ConductorManager,
-                 indexer: Indexer, plugin_manager: PluginManager, 
-                 checkpoint_manager: CheckpointManager):
+    def __init__(
+        self,
+        app_config: AppConfig,
+        session_manager: SessionManager,
+        attachment_manager: AttachmentManager,
+        conductor_manager: ConductorManager,
+        indexer: Indexer,
+        extension_manager: ExtensionManager,
+        checkpoint_manager: CheckpointManager,
+        vector_store: VectorStore,
+    ):
         super().__init__()
         self.app_config = app_config
         self.session_manager = session_manager
         self.attachment_manager = attachment_manager
         self.conductor_manager = conductor_manager
         self.indexer = indexer
-        self.plugin_manager = plugin_manager
+        self.extension_manager = extension_manager
         self.checkpoint_manager = checkpoint_manager
-        self.worker: Optional[GeminiWorker] = None
-        self.worker_thread: Optional[GeminiWorkerThread] = None
+        self.vector_store = vector_store
+        self.worker: GeminiWorker | None = None
+        self.worker_thread: GeminiWorkerThread | None = None
 
     def stop_worker(self) -> None:
         """Safely stops any running worker thread."""
         if self.worker_thread and self.worker_thread.isRunning():
             self.worker_thread.stop()
-            self.worker_thread.wait(3000) # Wait up to 3 seconds
+            self.worker_thread.wait(3000)  # Wait up to 3 seconds
             if self.worker_thread.isRunning():
                 self.worker_thread.terminate()
-        
+
         self.worker = None
         self.worker_thread = None
 
-    def send_message(self, prompt: str, system_instruction_override: Optional[str] = None) -> None:
+    def send_message(self, prompt: str, system_instruction_override: str | None = None) -> None:
         """Starts the Gemini worker to process the user request."""
         # Ensure previous worker is stopped
         self.stop_worker()
-        
+
         attachments = self.attachment_manager.get_attachments()
-        
+
         if not self.app_config.api_key:
             self.error_occurred.emit("Enter API Key in Settings.")
             return
 
         session_id = self.session_manager.current_session_id
-        session_data = self.session_manager.get_session(session_id)
-        
-        if not session_data["messages"]:
+        session = self.session_manager.get_session(session_id)
+
+        if not session:
+            return
+
+        if not session.messages:
             new_title = prompt[:25] if prompt else "Analysis"
             self.session_manager.update_session_title(session_id, new_title)
-            
+
         self.session_manager.add_message(session_id, Role.USER.value, prompt or "[Files]")
 
-        history_context = session_data["messages"][:-1]
-        
+        # Convert messages to dict for WorkerConfig compatibility
+        history_context = [m.model_dump() for m in session.messages[:-1]]
+
         # Get session-specific config
-        sess_config = session_data.get("config", {})
+        sess_config = session.config
         model = sess_config.get("model", self.app_config.model)
         temp = sess_config.get("temperature", self.app_config.get("temperature", 0.8))
         top_p = sess_config.get("top_p", self.app_config.get("top_p", 0.95))
@@ -115,9 +156,9 @@ class ChatController(QObject):
             thinking_enabled=thinking_enabled,
             thinking_budget=thinking_budget,
             session_id=session_id,
-            initial_plan=session_data.get("plan", ""),
-            initial_specs=session_data.get("specs", ""),
-            plugin_manager=self.plugin_manager
+            initial_plan=session.plan,
+            initial_specs=session.specs,
+            extension_manager=self.extension_manager,
         )
 
         self.worker = GeminiWorker(config)
@@ -129,7 +170,8 @@ class ChatController(QObject):
         self.worker.plan_updated.connect(lambda p: self.session_manager.update_session_plan(session_id, p))
         self.worker.specs_updated.connect(lambda s: self.session_manager.update_session_specs(session_id, s))
         self.worker.usage_updated.connect(self.usage_updated.emit)
-        
+        self.worker.rate_limit_updated.connect(self.rate_limit_updated.emit)
+
         try:
             self.worker_thread = GeminiWorkerThread(self.worker)
             # Use a member variable to keep the thread alive
@@ -143,7 +185,7 @@ class ChatController(QObject):
         finished_thread = self.sender()
         if finished_thread:
             finished_thread.deleteLater()
-            
+
             # Only clear the reference if it still points to the finished thread
             if self.worker_thread == finished_thread:
                 self.worker_thread = None
@@ -153,7 +195,21 @@ class ChatController(QObject):
         self.attachment_manager.clear_attachments()
         self.response_received.emit(text)
 
-    def confirm_tool(self, confirmation_id: str, allowed: bool, modified_args: Optional[Dict[str, Any]] = None) -> None:
+        # Async indexing to ChromaDB after response
+        asyncio.create_task(self._index_response_to_chroma(text))
+
+    async def _index_response_to_chroma(self, text: str):
+        """Indexes the AI response into ChromaDB asynchronously."""
+        session_id = self.session_manager.current_session_id
+        session = self.session_manager.get_session(session_id)
+        if not session:
+            return
+        doc_id = f"{session_id}_{len(session.messages)}"
+        self.vector_store.add_documents(
+            documents=[text], metadatas=[{"session_id": session_id, "role": "model"}], ids=[doc_id]
+        )
+
+    def confirm_tool(self, confirmation_id: str, allowed: bool, modified_args: dict[str, Any] | None = None) -> None:
         if self.worker:
             self.worker.confirm_tool(confirmation_id, allowed, modified_args)
 
@@ -163,10 +219,20 @@ class GeminiBrowser(QMainWindow):
     Main window for the Gemini AI Agent application.
     Handles UI layout and delegates logic to ChatController.
     """
-    def __init__(self, app_config: AppConfig, theme_manager: ThemeManager, 
-                 session_manager: SessionManager, attachment_manager: AttachmentManager,
-                 conductor_manager: ConductorManager, indexer: Indexer,
-                 plugin_manager: PluginManager, checkpoint_manager: CheckpointManager):
+
+    def __init__(
+        self,
+        app_config: AppConfig,
+        theme_manager: ThemeManager,
+        session_manager: SessionManager,
+        attachment_manager: AttachmentManager,
+        conductor_manager: ConductorManager,
+        indexer: Indexer,
+        extension_manager: ExtensionManager,
+        checkpoint_manager: CheckpointManager,
+        vector_store: VectorStore,
+        recent_manager: RecentManager,
+    ):
         super().__init__()
         self.app_config = app_config
         self.theme_manager = theme_manager
@@ -174,22 +240,30 @@ class GeminiBrowser(QMainWindow):
         self.attachment_manager = attachment_manager
         self.conductor_manager = conductor_manager
         self.indexer = indexer
-        self.plugin_manager = plugin_manager
+        self.extension_manager = extension_manager
         self.checkpoint_manager = checkpoint_manager
-        
+        self.vector_store = vector_store
+        self.recent_manager = recent_manager
+
         self.controller = ChatController(
-            app_config, session_manager, attachment_manager, 
-            conductor_manager, indexer, plugin_manager, checkpoint_manager
+            app_config,
+            session_manager,
+            attachment_manager,
+            conductor_manager,
+            indexer,
+            extension_manager,
+            checkpoint_manager,
+            vector_store,
         )
-        
-        self.status_widget: Optional[StatusWidget] = None
+
+        self.status_widget: StatusWidget | None = None
 
         self.init_ui()
         self._connect_controller()
         self.update_sidebar()
         self.create_new_session()
         self.refresh_index()
-        
+
         # Apply initial theme
         self.theme_manager.apply_theme(self.app_config.theme)
 
@@ -198,6 +272,7 @@ class GeminiBrowser(QMainWindow):
         self.controller.response_received.connect(self.on_response_success)
         self.controller.error_occurred.connect(self.on_response_error)
         self.controller.usage_updated.connect(self.on_usage_updated)
+        self.controller.rate_limit_updated.connect(self.on_rate_limit_updated)
         self.controller.terminal_output.connect(self.on_terminal_output)
         self.controller.tool_confirmation_requested.connect(self.show_tool_confirmation)
 
@@ -225,7 +300,7 @@ class GeminiBrowser(QMainWindow):
 
         main_layout.addWidget(self.splitter)
         self.header.set_mode(self.app_config.get("use_search", False))
-        
+
         self.setup_settings_menu()
 
     def _setup_sidebar(self) -> None:
@@ -235,11 +310,12 @@ class GeminiBrowser(QMainWindow):
         self.sidebar.new_chat_requested.connect(self.create_new_session)
         self.sidebar.session_selected.connect(self.load_session_from_list)
         self.sidebar.context_menu_requested.connect(self.show_context_menu)
-        
+        self.sidebar.recent_item_selected.connect(self.add_attachment)
+
         # Project Explorer
         self.project_explorer = ProjectExplorer(root_path=".")
         self.project_explorer.file_attached.connect(self.add_attachment)
-        self.project_explorer.folder_attached.connect(self.add_attachment)
+        self.project_explorer.folder_attached.connect(lambda p: self.add_attachment(p, "project"))
         self.sidebar_container.tabs.addTab(self.project_explorer, "📁 Project")
 
         # Symbol Browser
@@ -316,17 +392,15 @@ class GeminiBrowser(QMainWindow):
         self.btn_file.setFixedSize(36, 36)
         self.btn_file.clicked.connect(self.show_attach_menu)
 
-        self.input_field = AutoResizingTextEdit(self) 
+        self.input_field = AutoResizingTextEdit(self)
         self.input_field.returnPressed.connect(self.send_message)
 
         # Populate completer with tools, commands, and files
-        keywords = ["/clear", "/help", "/reset", "/conductor"]
+        keywords = ["/clear", "/help", "/reset", "/conductor", "/search"]
         keywords.extend(list(TOOL_REGISTRY.keys()))
         keywords.extend(self.conductor_manager.get_available_commands())
-        try:
+        with contextlib.suppress(OSError):
             keywords.extend([f for f in os.listdir(".") if not f.startswith(".")])
-        except OSError:
-            pass
         self.input_field.update_keywords(keywords)
 
         btn_send = QPushButton("➤")
@@ -343,30 +417,33 @@ class GeminiBrowser(QMainWindow):
     def setup_settings_menu(self) -> None:
         """Sets up the unified settings menu on the header button."""
         self.settings_menu = QMenu(self)
-        
+
         # 1. Settings Dialog
         self.settings_menu.addAction("⚙️ Application Settings").triggered.connect(self.open_settings)
         self.settings_menu.addSeparator()
-        
+
         # 2. Conductor Orchestrator
         self.settings_menu.addAction("🚀 Conductor Orchestrator").triggered.connect(self.open_conductor)
-        
+
         # 3. Conductor Submenu
         conductor_submenu = self.settings_menu.addMenu("📋 Conductor Commands")
         self._populate_conductor_menu(conductor_submenu)
-        
+
         self.settings_menu.addSeparator()
-        
+
         # 4. Plugins
         self.settings_menu.addAction("🔌 Manage Plugins").triggered.connect(self.open_plugins)
-        
+
         self.settings_menu.addSeparator()
-        
+
         # 5. History
         history_menu = self.settings_menu.addMenu("📜 History Management")
         history_menu.addAction("Backup History").triggered.connect(self.backup_history)
         history_menu.addAction("Restore History").triggered.connect(self.restore_history)
-        
+
+        self.settings_menu.addSeparator()
+        self.settings_menu.addAction("🧹 Clear Vector Cache").triggered.connect(self.vector_store.delete_collection)
+
         # Attach menu to button
         self.header.btn_settings.setMenu(self.settings_menu)
 
@@ -378,7 +455,7 @@ class GeminiBrowser(QMainWindow):
             action = menu.addAction("No commands found")
             action.setEnabled(False)
             return
-            
+
         for cmd in commands:
             action = menu.addAction(cmd.capitalize())
             action.triggered.connect(lambda checked, c=cmd: self.run_conductor_command(c))
@@ -396,12 +473,16 @@ class GeminiBrowser(QMainWindow):
 
     def refresh_index(self) -> None:
         """Refreshes the project index for symbol browsing in a background thread."""
+
         def _bg_index():
             self.indexer.index_project()
             # Use QMetaObject to safely update UI from background thread
-            QMetaObject.invokeMethod(self.symbol_browser, "set_symbols", 
-                                     Qt.ConnectionType.QueuedConnection, 
-                                     Q_ARG(list, self.indexer.get_all_symbols()))
+            QMetaObject.invokeMethod(
+                self.symbol_browser,
+                "set_symbols",
+                Qt.ConnectionType.QueuedConnection,
+                Q_ARG(list, self.indexer.get_all_symbols()),
+            )
 
         threading.Thread(target=_bg_index, daemon=True).start()
 
@@ -409,13 +490,17 @@ class GeminiBrowser(QMainWindow):
         """Handles symbol selection from the symbol browser."""
         full_path = os.path.join(self.indexer.root_dir, symbol.file_path)
         self.add_attachment(full_path)
-        QMessageBox.information(self, "Symbol Selected", f"Attached {symbol.file_path}\nSymbol: {symbol.name} (line {symbol.line})")
+        QMessageBox.information(
+            self,
+            "Symbol Selected",
+            f"Attached {symbol.file_path}\nSymbol: {symbol.name} (line {symbol.line})",
+        )
 
     def run_conductor_command(self, command_name: str) -> None:
         """Executes a specific conductor command."""
         prompt = f"Execute Conductor command: {command_name}"
         system_instruction = self.conductor_manager.get_command_prompt(command_name)
-        
+
         if not system_instruction:
             QMessageBox.warning(self, "Error", f"Command {command_name} not found.")
             return
@@ -423,7 +508,7 @@ class GeminiBrowser(QMainWindow):
         self.create_new_session()
         self.session_manager.update_session_title(self.session_manager.current_session_id, f"Conductor: {command_name}")
         self.update_sidebar()
-        
+
         self._start_worker(prompt, system_instruction_override=system_instruction)
 
     def toggle_sidebar(self) -> None:
@@ -442,7 +527,7 @@ class GeminiBrowser(QMainWindow):
     def attach_files_dialog(self) -> None:
         """Opens a dialog to select files for attachment."""
         files, _ = QFileDialog.getOpenFileNames(self, "Select Files", "", "All Files (*)")
-        if files: 
+        if files:
             for f in files:
                 self.add_attachment(f)
 
@@ -450,12 +535,14 @@ class GeminiBrowser(QMainWindow):
         """Opens a dialog to select a folder for attachment."""
         folder = QFileDialog.getExistingDirectory(self, "Select Folder")
         if folder:
-            self.add_attachment(folder)
+            self.add_attachment(folder, "project")
 
-    def add_attachment(self, path: str) -> None:
+    def add_attachment(self, path: str, item_type: str = "file") -> None:
         """Adds a file or folder to the current session's attachments."""
         self.attachment_manager.add_attachment(path)
+        self.recent_manager.add_item(path, item_type)
         self._update_attachment_ui()
+        self.update_sidebar()
 
     def remove_attachment(self, path: str) -> None:
         """Removes an attachment from the current session."""
@@ -470,7 +557,7 @@ class GeminiBrowser(QMainWindow):
             child = self.attachment_list_layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
-            
+
         # Add items
         attachments = self.attachment_manager.get_attachments()
         # Limit display to first 5 to avoid clutter
@@ -478,7 +565,7 @@ class GeminiBrowser(QMainWindow):
             item = AttachmentItem(path, self.app_config.theme)
             item.remove_requested.connect(self.remove_attachment)
             self.attachment_list_layout.addWidget(item)
-            
+
         if len(attachments) > 5:
             more_lbl = QLabel(f"+{len(attachments) - 5} more")
             more_lbl.setStyleSheet("color: #888; font-size: 11px;")
@@ -488,7 +575,7 @@ class GeminiBrowser(QMainWindow):
         """Applies the current theme to the entire application."""
         theme = self.app_config.theme
         self.theme_manager.apply_theme(theme)
-        
+
         # Custom styling for specific buttons that don't follow palette perfectly
         btn_style = """
             QPushButton { 
@@ -502,16 +589,20 @@ class GeminiBrowser(QMainWindow):
         """
         if theme == Theme.DARK.value:
             self.header.btn_toggle_sidebar.setStyleSheet(btn_style % ("#555", "#888", "#333"))
-            self.header.btn_settings.setStyleSheet("QPushButton { background-color: transparent; border: 1px solid #555; border-radius: 4px; color: #888; } QPushButton:hover { background-color: #333; color: #EEE; }")
+            self.header.btn_settings.setStyleSheet(
+                "QPushButton { background-color: transparent; border: 1px solid #555; border-radius: 4px; color: #888; } QPushButton:hover { background-color: #333; color: #EEE; }"
+            )
         else:
             self.header.btn_toggle_sidebar.setStyleSheet(btn_style % ("#CCC", "#555", "#EEE"))
-            self.header.btn_settings.setStyleSheet("QPushButton { background-color: transparent; border: 1px solid #CCC; border-radius: 4px; color: #555; } QPushButton:hover { background-color: #F0F0F0; color: #000; }")
+            self.header.btn_settings.setStyleSheet(
+                "QPushButton { background-color: transparent; border: 1px solid #CCC; border-radius: 4px; color: #555; } QPushButton:hover { background-color: #F0F0F0; color: #000; }"
+            )
 
         self.project_explorer.apply_theme(theme)
         self._update_attachment_ui()
 
-        if self.session_manager.current_session_id: 
-            self.load_session_from_list(None) # Reload current session UI
+        if self.session_manager.current_session_id:
+            self.load_session_from_list(None)  # Reload current session UI
 
     def create_new_session(self) -> None:
         """Creates a new chat session."""
@@ -522,46 +613,52 @@ class GeminiBrowser(QMainWindow):
         self.attachment_manager.clear_attachments()
         self._update_attachment_ui()
         self.update_sidebar()
-        
+
         self._refresh_usage_display()
 
     def update_sidebar(self) -> None:
         """Updates the sidebar with the latest session list."""
-        self.sidebar.populate_sessions(
-            self.session_manager.get_all_sessions(), 
-            self.session_manager.current_session_id
-        )
+        self.sidebar.populate_sessions(self.session_manager.get_all_sessions(), self.session_manager.current_session_id)
+        self.sidebar.update_recent_items(self.recent_manager.get_recent_items())
 
-    def load_session_from_list(self, item: Optional[QListWidgetItem]) -> None:
+    def load_session_from_list(self, item: QListWidgetItem | None) -> None:
         """Loads a session from the sidebar list."""
-        session_id = None
         if item:
             session_id = item.data(Qt.ItemDataRole.UserRole)
         else:
             session_id = self.session_manager.current_session_id
-            
+
+        if isinstance(session_id, dict):
+            session_id = session_id.get("id")
+
         if not session_id:
-            return 
-        
+            return
+
         self.session_manager.current_session_id = session_id
-        
+
         self.clear_chat_ui()
-        session_data = self.session_manager.get_session(session_id)
-        if session_data:
-            messages = session_data.get("messages", [])
+        session = self.session_manager.get_session(session_id)
+        if session:
+            messages = session.messages
             # Limit to last 50 messages for performance
             display_messages = messages[-50:] if len(messages) > 50 else messages
-            
+
             if len(messages) > 50:
                 info_lbl = QLabel(f"Showing last 50 of {len(messages)} messages.")
                 info_lbl.setStyleSheet("color: #888; font-style: italic; margin-left: 50px;")
                 self.messages_layout.addWidget(info_lbl)
 
             for msg in display_messages:
-                self.messages_layout.addWidget(MessageBubble(msg['text'], is_user=(msg['role'] == Role.USER.value), theme_mode=self.app_config.theme))
-            
+                self.messages_layout.addWidget(
+                    MessageBubble(
+                        msg.text,
+                        is_user=(msg.role == Role.USER.value),
+                        theme_mode=self.app_config.theme,
+                    )
+                )
+
             self._refresh_usage_display()
-            
+
         self.scroll_to_bottom()
 
     def clear_chat_ui(self) -> None:
@@ -579,7 +676,7 @@ class GeminiBrowser(QMainWindow):
             return
         if not item.data(Qt.ItemDataRole.UserRole):
             return
-        
+
         menu = QMenu()
         menu.addAction("Rename").triggered.connect(lambda: self.rename_session(item))
         menu.addAction("Export to Markdown").triggered.connect(lambda: self.export_session_to_markdown(item))
@@ -592,7 +689,7 @@ class GeminiBrowser(QMainWindow):
         sess_id = item.data(Qt.ItemDataRole.UserRole)
         if self.session_manager.delete_session(sess_id):
             self.update_sidebar()
-            if not self.session_manager.current_session_id: 
+            if not self.session_manager.current_session_id:
                 self.create_new_session()
 
     def rename_session(self, item: QListWidgetItem) -> None:
@@ -604,20 +701,21 @@ class GeminiBrowser(QMainWindow):
             self.session_manager.update_session_title(sess_id, new_name)
             self.update_sidebar()
 
-
     def export_session_to_markdown(self, item: QListWidgetItem) -> None:
         """Exports a session to a Markdown file."""
         sess_id = item.data(Qt.ItemDataRole.UserRole)
-        session_data = self.session_manager.get_session(sess_id)
-        if not session_data:
+        session = self.session_manager.get_session(sess_id)
+        if not session:
             return
 
-        safe_title = "".join([c for c in session_data.get("title", "session") if c.isalnum() or c in (' ', '_')]).rstrip()
+        safe_title = "".join(
+            [c for c in session.title if c.isalnum() or c in (" ", "_")]
+        ).rstrip()
         default_name = f"{safe_title}.md"
         file_path, _ = QFileDialog.getSaveFileName(self, "Export Session", default_name, "Markdown Files (*.md)")
-        
+
         if file_path:
-            if Exporter.export_to_file(session_data, Path(file_path)):
+            if Exporter.export_to_file(session, Path(file_path)):
                 QMessageBox.information(self, "Export Successful", f"Session exported to {file_path}")
             else:
                 QMessageBox.critical(self, "Export Failed", "Failed to export session.")
@@ -637,9 +735,12 @@ class GeminiBrowser(QMainWindow):
         if file_path:
             sessions = Exporter.restore_backup(Path(file_path))
             if sessions:
-                reply = QMessageBox.question(self, "Restore History", 
-                                           "This will replace your current history. Continue?",
-                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                reply = QMessageBox.question(
+                    self,
+                    "Restore History",
+                    "This will replace your current history. Continue?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                )
                 if reply == QMessageBox.StandardButton.Yes:
                     self.session_manager.sessions = sessions
                     self.session_manager.save_history()
@@ -664,21 +765,56 @@ class GeminiBrowser(QMainWindow):
 
     def open_plugins(self) -> None:
         """Opens the plugin management dialog."""
-        dialog = PluginDialog(self.plugin_manager, self, self.app_config.theme)
+        dialog = PluginDialog(self.extension_manager, self, self.app_config.theme)
         dialog.exec()
 
-    def send_message(self) -> None:
+    @asyncSlot()
+    async def send_message(self) -> None:
         """Sends the user message to the AI model."""
         prompt = self.input_field.toPlainText().strip()
         if not prompt and not self.attachment_manager.get_attachments():
             return
+
+        # Handle special commands
+        if prompt.startswith("/search "):
+            query = prompt[8:].strip()
+            await self._perform_semantic_search(query)
+            self.input_field.clear()
+            return
+
         self._start_worker(prompt)
         self.input_field.clear()
 
-    def _start_worker(self, prompt: str, system_instruction_override: Optional[str] = None) -> None:
+        # Index user prompt
+        session_id = self.session_manager.current_session_id
+        session = self.session_manager.get_session(session_id)
+        if session:
+            doc_id = f"{session_id}_{len(session.messages)}_user"
+            self.vector_store.add_documents(
+                documents=[prompt], metadatas=[{"session_id": session_id, "role": "user"}], ids=[doc_id]
+            )
+
+    async def _perform_semantic_search(self, query: str):
+        """Performs a semantic search and displays results in the chat."""
+        self.messages_layout.addWidget(
+            MessageBubble(f"🔍 Searching for: {query}", is_user=True, theme_mode=self.app_config.theme)
+        )
+
+        results = self.vector_store.query(query)
+        docs = results.get("documents", [[]])[0]
+
+        if not docs:
+            response = "No relevant information found in vector cache."
+        else:
+            response = "**Semantic Search Results:**\n\n" + "\n\n---\n\n".join(docs)
+
+        self.messages_layout.addWidget(MessageBubble(response, is_user=False, theme_mode=self.app_config.theme))
+        self.scroll_to_bottom()
+
+    def _start_worker(self, prompt: str, system_instruction_override: str | None = None) -> None:
         """Starts the Gemini worker to process the user request."""
         attachments = self.attachment_manager.get_attachments()
-        
+
         display_text = prompt + (f" [Files: {len(attachments)}]" if attachments else "")
         self.messages_layout.addWidget(MessageBubble(display_text, is_user=True, theme_mode=self.app_config.theme))
         self.scroll_to_bottom()
@@ -705,7 +841,7 @@ class GeminiBrowser(QMainWindow):
         """Shows a confirmation dialog for dangerous tool execution."""
         dialog = DeepReviewDialog(tool_name, args, parent=self, theme_mode=self.app_config.theme)
         result = dialog.exec()
-        allowed = (result == QDialog.DialogCode.Accepted)
+        allowed = result == QDialog.DialogCode.Accepted
         # Pass modified args if approved
         modified_args = dialog.get_args() if allowed else None
         self.controller.confirm_tool(confirmation_id, allowed, modified_args)
@@ -716,10 +852,10 @@ class GeminiBrowser(QMainWindow):
             self.status_widget.stop_loading()
             self.status_widget.deleteLater()
             self.status_widget = None
-            
+
         self.messages_layout.addWidget(MessageBubble(text, is_user=False, theme_mode=self.app_config.theme))
         self.scroll_to_bottom()
-        
+
         self._update_attachment_ui()
 
     def on_response_error(self, err: str) -> None:
@@ -728,8 +864,10 @@ class GeminiBrowser(QMainWindow):
             self.status_widget.stop_loading()
             self.status_widget.deleteLater()
             self.status_widget = None
-            
-        self.messages_layout.addWidget(MessageBubble(f"**Error:** {err}", is_user=False, theme_mode=self.app_config.theme))
+
+        self.messages_layout.addWidget(
+            MessageBubble(f"**Error:** {err}", is_user=False, theme_mode=self.app_config.theme)
+        )
         self.scroll_to_bottom()
 
     def on_status_update(self, status_message: str) -> None:
@@ -747,28 +885,36 @@ class GeminiBrowser(QMainWindow):
         if session_id == self.session_manager.current_session_id:
             self._refresh_usage_display()
 
+    def on_rate_limit_updated(self, model_id: str, remaining: int, limit: int) -> None:
+        """Updates the rate limit indicator in the status widget."""
+        if self.status_widget:
+            try:
+                self.status_widget.update_rate_limit(remaining, limit)
+            except RuntimeError:
+                self.status_widget = None
+
     def _refresh_usage_display(self) -> None:
         """Refreshes the usage display in the header."""
         session_id = self.session_manager.current_session_id
         if not session_id:
             return
-            
-        session_data = self.session_manager.get_session(session_id)
-        if not session_data:
+
+        session = self.session_manager.get_session(session_id)
+        if not session:
             return
-            
-        usage = session_data.get("usage", {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0})
-        
+
+        usage = session.usage
+
         # Calculate cost
-        sess_config = session_data.get("config", {})
+        sess_config = session.config
         model_id = sess_config.get("model", self.app_config.model)
-        
+
         pricing = ModelRegistry.MODEL_PRICING.get(model_id, (0.0, 0.0))
-        input_cost = (usage["input_tokens"] / 1_000_000) * pricing[0]
-        output_cost = (usage["output_tokens"] / 1_000_000) * pricing[1]
+        input_cost = (usage.input_tokens / 1_000_000) * pricing[0]
+        output_cost = (usage.output_tokens / 1_000_000) * pricing[1]
         total_cost = input_cost + output_cost
-        
-        self.header.update_usage(usage["total_tokens"], total_cost)
+
+        self.header.update_usage(usage.total_tokens, total_cost)
 
     def scroll_to_bottom(self) -> None:
         """Scrolls the chat area to the bottom."""
@@ -781,10 +927,67 @@ class GeminiBrowser(QMainWindow):
         self.attachment_manager.cleanup()
         event.accept()
 
-def main():
-    setup_logging()
+
+def main() -> None:
+    """Main entry point for the Gemini CLI."""
+    if sys.platform != "win32":
+        try:
+            multiprocessing.set_start_method("spawn", force=True)
+        except RuntimeError:
+            pass
+
+    parser = argparse.ArgumentParser(description="Gemini Agent CLI")
+    subparsers = parser.add_subparsers(dest="command")
+
+    # Extension CLI
+    extension_parser = subparsers.add_parser("extension", help="Manage extensions (plugins and MCP servers)")
+    ext_subparsers = extension_parser.add_subparsers(dest="ext_command")
+
+    # List
+    ext_subparsers.add_parser("list", help="List all extensions")
+
+    # Install Plugin
+    install_plugin_parser = ext_subparsers.add_parser("install-plugin", help="Install a plugin from PyPI")
+    install_plugin_parser.add_argument("package_name", help="The name of the plugin package")
+
+    # Uninstall Plugin
+    uninstall_plugin_parser = ext_subparsers.add_parser("uninstall-plugin", help="Uninstall a plugin")
+    uninstall_plugin_parser.add_argument("plugin_name", help="The name of the plugin")
+
+    # Add MCP
+    add_mcp_parser = ext_subparsers.add_parser("add-mcp", help="Add an MCP server")
+    add_mcp_parser.add_argument("name", help="Name of the MCP server")
+    add_mcp_parser.add_argument("command", help="Command to run")
+    add_mcp_parser.add_argument("--args", nargs="*", help="Arguments for the command")
+
+    # Remove MCP
+    remove_mcp_parser = ext_subparsers.add_parser("remove-mcp", help="Remove an MCP server")
+    remove_mcp_parser.add_argument("name", help="Name of the MCP server")
+
+    args = parser.parse_args()
+
+    extension_mgr = ExtensionManager()
+    extension_mgr.discover_plugins()
+
+    if args.command == "extension":
+        if args.ext_command == "list":
+            print(json.dumps(extension_mgr.list_extensions(), indent=2))
+        elif args.ext_command == "install-plugin":
+            print(extension_mgr.install_plugin(args.package_name))
+        elif args.ext_command == "uninstall-plugin":
+            print(extension_mgr.uninstall_plugin(args.plugin_name))
+        elif args.ext_command == "add-mcp":
+            print(extension_mgr.add_mcp_server(args.name, args.command, args.args or []))
+        elif args.ext_command == "remove-mcp":
+            print(extension_mgr.remove_mcp_server(args.name))
+        sys.exit(0)
+
     app = QApplication(sys.argv)
-    
+
+    # Initialize qasync event loop
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
     # Initialize services (Dependency Injection)
     config = AppConfig()
     theme_mgr = ThemeManager(app)
@@ -792,17 +995,31 @@ def main():
     attachment_mgr = AttachmentManager()
     conductor_mgr = ConductorManager(extension_path=config.conductor_path)
     indexer = Indexer(root_dir=".")
-    plugin_mgr = PluginManager()
-    plugin_mgr.discover_plugins()
     checkpoint_mgr = CheckpointManager()
-    
+    vector_store = VectorStore()
+    recent_mgr = RecentManager()
+
     # Inject into main window
     window = GeminiBrowser(
-        config, theme_mgr, session_mgr, attachment_mgr, 
-        conductor_mgr, indexer, plugin_mgr, checkpoint_mgr
+        config,
+        theme_mgr,
+        session_mgr,
+        attachment_mgr,
+        conductor_mgr,
+        indexer,
+        extension_mgr,
+        checkpoint_mgr,
+        vector_store,
+        recent_mgr,
     )
     window.show()
-    sys.exit(app.exec())
 
-if __name__ == '__main__':
-    main()
+    with loop:
+        loop.run_forever()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

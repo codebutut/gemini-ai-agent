@@ -1,47 +1,50 @@
 import asyncio
-import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Optional, List, Dict, Union, Tuple
+from typing import Any
 
-from PyQt6.QtCore import QObject, pyqtSignal, QThread
 from google import genai
 from google.genai import types
+from PyQt6.QtCore import QObject, QThread, pyqtSignal
 
-from gemini_agent.utils.helpers import RateLimiter
+from gemini_agent.config.app_config import ModelRegistry
 from gemini_agent.core import tools
-from gemini_agent.core.plugins import PluginManager
-from gemini_agent.core.mode_detector import ModeDetector
 from gemini_agent.core.context_manager import ContextManager
+from gemini_agent.core.extension_manager import ExtensionManager
+from gemini_agent.core.mode_detector import ModeDetector
 from gemini_agent.core.tool_executor import ToolExecutor
-from gemini_agent.utils.logger import get_logger, AgentLoggerAdapter
+from gemini_agent.utils.helpers import RateLimiter
+from gemini_agent.utils.logger import AgentLoggerAdapter, get_logger
 
 logger = get_logger(__name__)
+
 
 @dataclass
 class WorkerConfig:
     api_key: str
     prompt: str
     model: str
-    file_paths: List[str]
-    history_context: List[Dict[str, str]]
+    file_paths: list[str]
+    history_context: list[dict[str, str]]
     use_grounding: bool = False
-    system_instruction: Optional[str] = None
+    system_instruction: str | None = None
     temperature: float = 0.8
     top_p: float = 0.95
     max_turns: int = 20
     thinking_enabled: bool = False
     thinking_budget: int = 4096
-    session_id: Optional[str] = None
+    session_id: str | None = None
     initial_plan: str = ""
     initial_specs: str = ""
-    plugin_manager: Optional[PluginManager] = None
+    extension_manager: ExtensionManager | None = None
+
 
 class GeminiWorker(QObject):
     """
     Async worker to handle Gemini API requests using asyncio.
     Communicates with the UI via signals.
     """
+
     finished = pyqtSignal(str)
     error = pyqtSignal(str)
     status_update = pyqtSignal(str)
@@ -50,76 +53,102 @@ class GeminiWorker(QObject):
     plan_updated = pyqtSignal(str)
     specs_updated = pyqtSignal(str)
     usage_updated = pyqtSignal(str, int, int)
-    
-    RATE_LIMITER = RateLimiter(max_requests=20, period=60, auto_refill=True)
+    rate_limit_updated = pyqtSignal(str, int, int)  # model_id, remaining, limit
+
+    # Shared rate limiters per model to persist across worker instances
+    _RATE_LIMITERS: dict[str, RateLimiter] = {}
 
     def __init__(self, config: WorkerConfig):
         super().__init__()
         self.config = config
         self.log = AgentLoggerAdapter(logger, {"session_id": config.session_id})
-        
+
         self._confirmation_event = asyncio.Event()
-        self._confirmation_result: Optional[bool] = None
-        self._confirmation_modified_args: Optional[Dict[str, Any]] = None
-        self._current_confirmation_id: Optional[str] = None
-        self._loop: Optional[asyncio.AbstractEventLoop] = None
-        
+        self._confirmation_result: bool | None = None
+        self._confirmation_modified_args: dict[str, Any] | None = None
+        self._current_confirmation_id: str | None = None
+        self._loop: asyncio.AbstractEventLoop | None = None
+
         self.mode_detector = ModeDetector()
-        self.tool_executor: Optional[ToolExecutor] = None
-        self.context_manager: Optional[ContextManager] = None
+        self.tool_executor: ToolExecutor | None = None
+        self.context_manager: ContextManager | None = None
         self._is_cancelled = False
+
+        # Initialize or retrieve rate limiter for this model
+        self.rate_limiter = self._get_rate_limiter(config.model)
+
+    def _get_rate_limiter(self, model_id: str) -> RateLimiter:
+        """Retrieves or creates a rate limiter for the specific model."""
+        if model_id not in GeminiWorker._RATE_LIMITERS:
+            attrs = ModelRegistry.get_attributes(model_id)
+            GeminiWorker._RATE_LIMITERS[model_id] = RateLimiter(
+                max_requests=attrs.get("rate_limit_requests", 20),
+                period=attrs.get("rate_limit_period", 60),
+                auto_refill=True,
+            )
+        return GeminiWorker._RATE_LIMITERS[model_id]
 
     def cancel(self):
         self._is_cancelled = True
 
-    def confirm_tool(self, confirmation_id: str, allowed: bool, modified_args: Optional[Dict[str, Any]] = None) -> None:
+    def confirm_tool(self, confirmation_id: str, allowed: bool, modified_args: dict[str, Any] | None = None) -> None:
         """Called by the UI thread to provide confirmation result."""
         if self._current_confirmation_id == confirmation_id:
             self._confirmation_result = allowed
             self._confirmation_modified_args = modified_args
-            
+
             if self._loop and self._loop.is_running():
                 self._loop.call_soon_threadsafe(self._confirmation_event.set)
             else:
-                self.log.warning("Worker loop not available/running to set confirmation event. Falling back to direct set.")
+                self.log.warning(
+                    "Worker loop not available/running to set confirmation event. Falling back to direct set."
+                )
                 # Fallback for tests or non-running loop
                 try:
                     self._confirmation_event.set()
                 except Exception as e:
                     self.log.error(f"Failed to set confirmation event: {e}")
 
-    async def _request_tool_confirmation(self, fn_name: str, fn_args: Dict[str, Any]) -> Tuple[bool, Optional[Dict[str, Any]]]:
+    async def _request_tool_confirmation(
+        self, fn_name: str, fn_args: dict[str, Any]
+    ) -> tuple[bool, dict[str, Any] | None]:
         """Requests user confirmation for dangerous tools (async)."""
         confirmation_id = str(uuid.uuid4())
         self._current_confirmation_id = confirmation_id
         self._confirmation_event.clear()
         self._confirmation_modified_args = None
-        
+
         self.status_update.emit(f"⚠️ Waiting for confirmation: {fn_name}...")
         self.terminal_output.emit(f"⚠️ Requesting confirmation for: {fn_name}\n", "info")
         self.request_confirmation.emit(fn_name, fn_args, confirmation_id)
-        
+
         await self._confirmation_event.wait()
         return self._confirmation_result, self._confirmation_modified_args
 
-    def _create_config(self, tools_config: Optional[types.Tool] = None) -> types.GenerateContentConfig:
+    def _create_config(self, tools_config: types.Tool | None = None) -> types.GenerateContentConfig:
         config_args = {
             "temperature": self.config.temperature,
             "top_p": self.config.top_p,
-            "system_instruction": self.config.system_instruction
+            "system_instruction": self.config.system_instruction,
         }
         if tools_config:
             config_args["tools"] = [tools_config]
-        
-        if self.config.thinking_enabled:
+
+        # Check model attributes for thinking support
+        model_attrs = ModelRegistry.get_attributes(self.config.model)
+        supports_thinking = model_attrs.get("supports_thinking", False)
+
+        if self.config.thinking_enabled and supports_thinking:
             try:
-                if hasattr(types, 'ThinkingConfig'):
+                if hasattr(types, "ThinkingConfig"):
                     config_args["thinking_config"] = types.ThinkingConfig(include_thoughts=True)
                 if self.config.thinking_budget > 0:
                     config_args["max_output_tokens"] = self.config.thinking_budget
             except Exception as e:
                 self.log.warning(f"Failed to configure thinking: {e}")
-                
+        elif self.config.thinking_enabled and not supports_thinking:
+            self.log.warning(f"Thinking enabled but model {self.config.model} does not support it. Ignoring.")
+
         return types.GenerateContentConfig(**config_args)
 
     async def run_async(self) -> None:
@@ -131,23 +160,20 @@ class GeminiWorker(QObject):
         try:
             client = genai.Client(api_key=self.config.api_key)
             self.context_manager = ContextManager(client)
-            
+
             # Capture the loop for thread-safe callbacks from the executor thread
             loop = asyncio.get_running_loop()
             self._loop = loop
-            
-            def sync_confirmation_callback(fn_name: str, fn_args: Dict[str, Any]) -> Tuple[bool, Optional[Dict[str, Any]]]:
-                future = asyncio.run_coroutine_threadsafe(
-                    self._request_tool_confirmation(fn_name, fn_args),
-                    loop
-                )
+
+            def sync_confirmation_callback(fn_name: str, fn_args: dict[str, Any]) -> tuple[bool, dict[str, Any] | None]:
+                future = asyncio.run_coroutine_threadsafe(self._request_tool_confirmation(fn_name, fn_args), loop)
                 return future.result()
 
             self.tool_executor = ToolExecutor(
                 status_callback=self.status_update.emit,
                 terminal_callback=self.terminal_output.emit,
                 confirmation_callback=sync_confirmation_callback,
-                plugin_manager=self.config.plugin_manager
+                extension_manager=self.config.extension_manager,
             )
             self.tool_executor.current_plan = self.config.initial_plan
             self.tool_executor.current_specs = self.config.initial_specs
@@ -157,10 +183,10 @@ class GeminiWorker(QObject):
 
             # 2. Prepare Current Turn Content
             current_turn_parts = self.context_manager.prepare_current_turn(
-                self.config.prompt, 
+                self.config.prompt,
                 self.config.file_paths,
                 self.tool_executor.current_plan,
-                self.tool_executor.current_specs
+                self.tool_executor.current_specs,
             )
             gemini_contents.append(types.Content(role="user", parts=current_turn_parts))
 
@@ -169,7 +195,7 @@ class GeminiWorker(QObject):
             self.log.info(f"Using mode: {mode}")
 
             # 4. Execute
-            if mode == 'grounding':
+            if mode == "grounding":
                 await self._run_grounding_mode(client, gemini_contents)
             else:
                 await self._handle_function_calls(client, gemini_contents)
@@ -179,21 +205,20 @@ class GeminiWorker(QObject):
         finally:
             pass
 
-    async def _run_grounding_mode(self, client: genai.Client, gemini_contents: List[types.Content]) -> None:
+    async def _run_grounding_mode(self, client: genai.Client, gemini_contents: list[types.Content]) -> None:
         self.status_update.emit("🔍 Searching the web...")
-        
-        await GeminiWorker.RATE_LIMITER.acquire_async()
-        if self._is_cancelled: return
+
+        await self.rate_limiter.acquire_async()
+        if self._is_cancelled:
+            return
 
         config = self._create_config(tools_config=types.Tool(google_search=types.GoogleSearch()))
-        
+
         try:
             response = await client.aio.models.generate_content(
-                model=self.config.model,
-                contents=gemini_contents,
-                config=config
+                model=self.config.model, contents=gemini_contents, config=config
             )
-            
+
             self._update_usage(response)
 
             if response.candidates:
@@ -204,7 +229,7 @@ class GeminiWorker(QObject):
                 self.finished.emit(final_text or "[No text response from web search]")
             else:
                 self.error.emit("API returned no candidates in grounding mode.")
-                
+
         except Exception as api_error:
             if "Tool use with function calling is unsupported" in str(api_error):
                 self.status_update.emit("⚠️ Web search not available, using local tools...")
@@ -215,10 +240,32 @@ class GeminiWorker(QObject):
     def _update_usage(self, response: Any) -> None:
         if response.usage_metadata and self.config.session_id:
             self.usage_updated.emit(
-                self.config.session_id, 
-                response.usage_metadata.prompt_token_count or 0, 
-                response.usage_metadata.candidates_token_count or 0
+                self.config.session_id,
+                response.usage_metadata.prompt_token_count or 0,
+                response.usage_metadata.candidates_token_count or 0,
             )
+
+        # Update rate limit telemetry
+        try:
+            remaining = self.rate_limiter.remaining()
+            limit = self.rate_limiter.max_requests
+
+            # Attempt to extract real-time telemetry from response headers if available
+            if hasattr(response, "_response") and hasattr(response._response, "headers"):
+                headers = response._response.headers
+                # Gemini API headers for rate limits (RPM)
+                # Note: These header names might vary slightly depending on the specific API endpoint
+                remaining_header = headers.get("x-ratelimit-remaining-requests")
+                limit_header = headers.get("x-ratelimit-limit-requests")
+
+                if remaining_header is not None and limit_header is not None:
+                    remaining = int(remaining_header)
+                    limit = int(limit_header)
+                    self.rate_limiter.update_limits(remaining, limit)
+
+            self.rate_limit_updated.emit(self.config.model, remaining, limit)
+        except Exception as e:
+            self.log.warning(f"Failed to update rate limit telemetry: {e}")
 
     def _handle_run_error(self, e: Exception) -> None:
         error_str = str(e)
@@ -230,29 +277,28 @@ class GeminiWorker(QObject):
         else:
             self.error.emit(f"An unexpected error occurred: {e}")
 
-    async def _handle_function_calls(self, client: genai.Client, gemini_contents: List[types.Content]) -> None:
+    async def _handle_function_calls(self, client: genai.Client, gemini_contents: list[types.Content]) -> None:
         final_response_text = ""
         loop_active = True
         turn_count = 0
         progress_metrics = []
         last_output = None
 
-        extra_tools = self.config.plugin_manager.get_all_tools() if self.config.plugin_manager else []
+        extra_tools = self.config.extension_manager.get_all_tools() if self.config.extension_manager else []
         tools_config = tools.get_tool_config(extra_declarations=extra_tools)
 
         while loop_active and turn_count < self.config.max_turns and not self._is_cancelled:
             turn_count += 1
             self.status_update.emit(f"🔄 Thinking (Turn {turn_count}/{self.config.max_turns})...")
-            
-            await GeminiWorker.RATE_LIMITER.acquire_async()
-            if self._is_cancelled: return
+
+            await self.rate_limiter.acquire_async()
+            if self._is_cancelled:
+                return
 
             config = self._create_config(tools_config=tools_config)
-            
+
             response = await client.aio.models.generate_content(
-                model=self.config.model,
-                contents=gemini_contents,
-                config=config
+                model=self.config.model, contents=gemini_contents, config=config
             )
 
             self._update_usage(response)
@@ -270,27 +316,37 @@ class GeminiWorker(QObject):
 
             function_responses = []
             function_calls = [p.function_call for p in model_parts if p.function_call]
-            
+
             if function_calls:
                 # Execute all tools in parallel for this turn
                 tasks = []
                 for fc in function_calls:
-                    tasks.append(asyncio.to_thread(self.tool_executor.execute, fc.name, {k: v for k, v in fc.args.items()}))
-                
+                    tasks.append(
+                        asyncio.to_thread(self.tool_executor.execute, fc.name, {k: v for k, v in fc.args.items()})
+                    )
+
                 results = await asyncio.gather(*tasks)
-                
-                for fc, result in zip(function_calls, results):
+
+                for fc, result in zip(function_calls, results, strict=False):
                     # Check if plan or specs were updated
-                    if fc.name in ["update_plan", "write_file"] and self.tool_executor.current_plan != self.config.initial_plan:
+                    if (
+                        fc.name in ["update_plan", "write_file"]
+                        and self.tool_executor.current_plan != self.config.initial_plan
+                    ):
                         self.plan_updated.emit(self.tool_executor.current_plan)
-                    if fc.name in ["update_specs", "write_file"] and self.tool_executor.current_specs != self.config.initial_specs:
+                    if (
+                        fc.name in ["update_specs", "write_file"]
+                        and self.tool_executor.current_specs != self.config.initial_specs
+                    ):
                         self.specs_updated.emit(self.tool_executor.current_specs)
 
                     current_output = f"{fc.name}:{str(result)[:50]}"
                     progress_metrics.append("progress_made" if current_output != last_output else "no_progress")
                     last_output = current_output
 
-                    function_responses.append(types.Part.from_function_response(name=fc.name, response={"result": result}))
+                    function_responses.append(
+                        types.Part.from_function_response(name=fc.name, response={"result": result})
+                    )
 
                 if self._is_stuck(progress_metrics):
                     final_response_text = "[System: Agent stuck in repetitive loop. Process stopped.]"
@@ -313,8 +369,13 @@ class GeminiWorker(QObject):
             self.finished.emit(final_response_text)
 
     def _is_valid_candidate(self, candidate: Any) -> bool:
-        if not hasattr(candidate, 'content') or candidate.content is None or not hasattr(candidate.content, 'parts') or candidate.content.parts is None:
-            finish_reason = getattr(candidate, 'finish_reason', 'UNKNOWN')
+        if (
+            not hasattr(candidate, "content")
+            or candidate.content is None
+            or not hasattr(candidate.content, "parts")
+            or candidate.content.parts is None
+        ):
+            finish_reason = getattr(candidate, "finish_reason", "UNKNOWN")
             error_msg = f"API returned an empty response (Finish Reason: {finish_reason})."
             if finish_reason == "SAFETY":
                 error_msg = "Response blocked by safety filters."
@@ -322,14 +383,16 @@ class GeminiWorker(QObject):
             return False
         return True
 
-    def _is_stuck(self, progress_metrics: List[str]) -> bool:
+    def _is_stuck(self, progress_metrics: list[str]) -> bool:
         return len(progress_metrics) >= 3 and all(p == "no_progress" for p in progress_metrics[-3:])
+
 
 class GeminiWorkerThread(QThread):
     """
     A QThread that runs an asyncio event loop.
     Used to run GeminiWorker without blocking the UI.
     """
+
     def __init__(self, worker: GeminiWorker):
         super().__init__()
         self.worker = worker

@@ -1,15 +1,24 @@
 import json
 import os
+
+from PyQt6.QtGui import QColor, QFont
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QTextEdit, QLabel, QTabWidget, QWidget, QListWidget,
-    QMessageBox, QFrame, QListWidgetItem
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QListWidget,
+    QListWidgetItem,
+    QMessageBox,
+    QPushButton,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt6.QtGui import QFont, QColor, QIcon, QAction
-from PyQt6.QtCore import Qt, QSize
 
 from gemini_agent.core.review_engine import ReviewEngine
 from gemini_agent.ui.widgets import GeminiHighlighter
+
 
 class DeepReviewDialog(QDialog):
     def __init__(self, tool_name, args, parent=None, theme_mode="Dark"):
@@ -20,7 +29,7 @@ class DeepReviewDialog(QDialog):
         self.args = args
         self.theme_mode = theme_mode
         self.review_engine = ReviewEngine()
-        
+
         self.init_ui()
         self.apply_theme_to_dialog()
         self.load_data()
@@ -47,16 +56,16 @@ class DeepReviewDialog(QDialog):
         source_container = QWidget()
         source_layout = QVBoxLayout(source_container)
         source_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         self.source_viewer = QTextEdit()
         self.source_viewer.setReadOnly(False)
         self.source_viewer.setFont(QFont("Courier New", 10))
         source_layout.addWidget(self.source_viewer)
-        
+
         self.btn_copy_source = QPushButton("Copy to Clipboard")
         self.btn_copy_source.clicked.connect(self.copy_source)
         source_layout.addWidget(self.btn_copy_source)
-        
+
         self.tabs.addTab(source_container, "Proposed Source")
 
         # Tab 3: Analysis
@@ -70,50 +79,39 @@ class DeepReviewDialog(QDialog):
 
         # Footer Buttons
         btn_layout = QHBoxLayout()
-        
+
         self.btn_save = QPushButton("Save Changes")
         self.btn_save.clicked.connect(self.save_changes)
-        
-        self.btn_maximize = QPushButton("Maximize")
-        self.btn_maximize.clicked.connect(self.toggle_maximize)
-        
+
         self.btn_reject = QPushButton("Reject")
         self.btn_reject.clicked.connect(self.reject)
-        
+
         self.btn_approve = QPushButton("Approve")
         self.btn_approve.clicked.connect(self.accept)
 
-        btn_layout.addWidget(self.btn_maximize)
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_save)
         btn_layout.addWidget(self.btn_reject)
         btn_layout.addWidget(self.btn_approve)
-        
-        layout.addLayout(btn_layout)
 
-    def toggle_maximize(self):
-        if self.isMaximized():
-            self.showNormal()
-            self.btn_maximize.setText("Maximize")
-        else:
-            self.showMaximized()
-            self.btn_maximize.setText("Restore")
+        layout.addLayout(btn_layout)
 
     def save_changes(self):
         """Updates internal args with the content from the source viewer."""
         new_content = self.source_viewer.toPlainText()
-        
-        if 'content' in self.args:
-            self.args['content'] = new_content
-        elif 'code' in self.args:
-            self.args['code'] = new_content
-            
+
+        if "content" in self.args:
+            self.args["content"] = new_content
+        elif "code" in self.args:
+            self.args["code"] = new_content
+
         # Re-run analysis on new content
-        self.review_engine.analyze_code(new_content) # Just to refresh internal state if needed
-        
+        self.review_engine.analyze_code(new_content)  # Just to refresh internal state if needed
+
         # Visual feedback
         self.btn_save.setText("Saved ✓")
         from PyQt6.QtCore import QTimer
+
         QTimer.singleShot(2000, lambda: self.btn_save.setText("Save Changes"))
 
     def get_args(self):
@@ -126,7 +124,7 @@ class DeepReviewDialog(QDialog):
         fg = "#E3E3E3" if is_dark else "#000000"
         input_bg = "#282A2C" if is_dark else "#F0F4F9"
         tab_bg = "#131314" if is_dark else "#F0F4F9"
-        
+
         self.setStyleSheet(f"""
             QDialog {{ 
                 background-color: {bg}; 
@@ -138,16 +136,16 @@ class DeepReviewDialog(QDialog):
             QTextEdit, QListWidget {{ 
                 background-color: {input_bg}; 
                 color: {fg}; 
-                border: 1px solid {'#444' if is_dark else '#CCC'}; 
+                border: 1px solid {"#444" if is_dark else "#CCC"}; 
                 border-radius: 8px;
                 padding: 5px;
             }}
             QTabWidget::pane {{
-                border: 1px solid {'#444' if is_dark else '#CCC'};
+                border: 1px solid {"#444" if is_dark else "#CCC"};
                 background-color: {tab_bg};
             }}
             QTabBar::tab {{
-                background-color: {'#2D2E30' if is_dark else '#E0E0E0'};
+                background-color: {"#2D2E30" if is_dark else "#E0E0E0"};
                 color: {fg};
                 padding: 8px 12px;
                 border-top-left-radius: 4px;
@@ -156,45 +154,45 @@ class DeepReviewDialog(QDialog):
             }}
             QTabBar::tab:selected {{
                 background-color: {input_bg};
-                border: 1px solid {'#444' if is_dark else '#CCC'};
+                border: 1px solid {"#444" if is_dark else "#CCC"};
                 border-bottom-color: {input_bg};
             }}
         """)
-        
+
         # Style buttons
         self.btn_reject.setStyleSheet(f"""
             QPushButton {{
-                background-color: {'#442a2a' if is_dark else '#ffcccc'};
-                color: {'#ffa3a3' if is_dark else '#cc0000'};
-                border: 1px solid {'#663333' if is_dark else '#ff9999'};
+                background-color: {"#442a2a" if is_dark else "#ffcccc"};
+                color: {"#ffa3a3" if is_dark else "#cc0000"};
+                border: 1px solid {"#663333" if is_dark else "#ff9999"};
                 border-radius: 4px;
                 padding: 8px 20px;
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {'#553333' if is_dark else '#ffb3b3'};
+                background-color: {"#553333" if is_dark else "#ffb3b3"};
             }}
         """)
-        
+
         self.btn_approve.setStyleSheet(f"""
             QPushButton {{
-                background-color: {'#1e3a1e' if is_dark else '#ccffcc'};
-                color: {'#afffbe' if is_dark else '#006600'};
-                border: 1px solid {'#336633' if is_dark else '#99ff99'};
+                background-color: {"#1e3a1e" if is_dark else "#ccffcc"};
+                color: {"#afffbe" if is_dark else "#006600"};
+                border: 1px solid {"#336633" if is_dark else "#99ff99"};
                 border-radius: 4px;
                 padding: 8px 20px;
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {'#2a4a2a' if is_dark else '#b3ffb3'};
+                background-color: {"#2a4a2a" if is_dark else "#b3ffb3"};
             }}
         """)
-        
+
         self.btn_copy_source.setStyleSheet(f"""
             QPushButton {{
-                background-color: {'#333' if is_dark else '#EEE'};
+                background-color: {"#333" if is_dark else "#EEE"};
                 color: {fg};
-                border: 1px solid {'#555' if is_dark else '#CCC'};
+                border: 1px solid {"#555" if is_dark else "#CCC"};
                 border-radius: 4px;
                 padding: 5px;
             }}
@@ -202,22 +200,21 @@ class DeepReviewDialog(QDialog):
 
         self.btn_save.setStyleSheet(f"""
             QPushButton {{
-                background-color: {'#333' if is_dark else '#EEE'};
+                background-color: {"#333" if is_dark else "#EEE"};
                 color: {fg};
-                border: 1px solid {'#555' if is_dark else '#CCC'};
+                border: 1px solid {"#555" if is_dark else "#CCC"};
                 border-radius: 4px;
                 padding: 8px 20px;
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {'#444' if is_dark else '#DDD'};
+                background-color: {"#444" if is_dark else "#DDD"};
             }}
         """)
 
-        self.btn_maximize.setStyleSheet(self.btn_save.styleSheet()) # Same style as Save
-
     def copy_source(self):
         from PyQt6.QtWidgets import QApplication
+
         QApplication.clipboard().setText(self.source_viewer.toPlainText())
         QMessageBox.information(self, "Copied", "Source code copied to clipboard.")
 
@@ -226,19 +223,19 @@ class DeepReviewDialog(QDialog):
         self.raw_viewer.setText(json.dumps(self.args, indent=2))
 
         # 2. Determine Content and Filepath
-        content = self.args.get('content', '')
-        filepath = self.args.get('filepath', '')
-        
+        content = self.args.get("content", "")
+        filepath = self.args.get("filepath", "")
+
         # Handle 'code' argument for python execution tools
-        if not content and 'code' in self.args:
-            content = self.args['code']
+        if not content and "code" in self.args:
+            content = self.args["code"]
             filepath = "InMemory Script"
 
         # 3. Load Existing Content (if applicable)
         existing_content = ""
         if filepath and os.path.exists(filepath) and os.path.isfile(filepath):
             try:
-                with open(filepath, 'r', encoding='utf-8') as f:
+                with open(filepath, encoding="utf-8") as f:
                     existing_content = f.read()
             except Exception as e:
                 existing_content = f"Error reading file: {e}"
@@ -252,32 +249,38 @@ class DeepReviewDialog(QDialog):
         lang = "python"
         if filepath:
             ext = os.path.splitext(filepath)[1].lower()
-            if ext == ".js": lang = "javascript"
-            elif ext == ".html": lang = "html"
-            elif ext == ".css": lang = "css"
-            elif ext == ".json": lang = "json"
-            elif ext == ".md": lang = "markdown"
-            elif ext == ".sh": lang = "bash"
-        
+            if ext == ".js":
+                lang = "javascript"
+            elif ext == ".html":
+                lang = "html"
+            elif ext == ".css":
+                lang = "css"
+            elif ext == ".json":
+                lang = "json"
+            elif ext == ".md":
+                lang = "markdown"
+            elif ext == ".sh":
+                lang = "bash"
+
         self.highlighter = GeminiHighlighter(self.source_viewer.document(), lang, self.theme_mode)
         self.source_viewer.setPlainText(content)
 
         # 6. Run Analysis
         issues = self.review_engine.analyze_code(content)
         security_risks = self.review_engine.scan_security(content)
-        
+
         if not issues and not security_risks:
             self.analysis_list.addItem("✅ No syntax errors or obvious security risks found.")
         else:
             # Add Security Risks first (higher priority)
             for risk in security_risks:
                 item = QListWidgetItem(risk)
-                item.setForeground(QColor("#ff5555")) # Red
+                item.setForeground(QColor("#ff5555"))  # Red
                 font = item.font()
                 font.setBold(True)
                 item.setFont(font)
                 self.analysis_list.addItem(item)
-            
+
             # Add Linting Issues
             for issue in issues:
                 item = QListWidgetItem(issue)
@@ -287,9 +290,9 @@ class DeepReviewDialog(QDialog):
                     font.setBold(True)
                     item.setFont(font)
                 elif "LINT" in issue:
-                    item.setForeground(QColor("#ffb86c")) # Orange
+                    item.setForeground(QColor("#ffb86c"))  # Orange
                 self.analysis_list.addItem(item)
-                
+
             # Highlight the tab if there are issues
             total_issues = len(issues) + len(security_risks)
             self.tabs.setTabText(2, f"Analysis ({total_issues} Issues)")

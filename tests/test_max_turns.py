@@ -1,8 +1,10 @@
-import unittest
 import json
 import os
+import unittest
 from pathlib import Path
+
 from config.app_config import AppConfig
+
 
 class TestMaxTurns(unittest.TestCase):
     def setUp(self):
@@ -21,18 +23,19 @@ class TestMaxTurns(unittest.TestCase):
     def test_set_max_turns(self):
         self.config.set("max_turns", 35, sync=True)
         self.assertEqual(self.config.get("max_turns"), 35)
-        
+
         # Verify it's saved to file
-        with open(self.config_file, "r") as f:
+        with open(self.config_file) as f:
             data = json.load(f)
             self.assertEqual(data["max_turns"], 35)
 
     def test_load_max_turns(self):
         with open(self.config_file, "w") as f:
             json.dump({"max_turns": 42}, f)
-        
+
         new_config = AppConfig(config_file=self.config_file)
         self.assertEqual(new_config.get("max_turns"), 42)
+
 
 if __name__ == "__main__":
     unittest.main()

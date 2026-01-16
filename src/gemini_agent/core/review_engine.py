@@ -1,16 +1,16 @@
-import difflib
 import ast
-import re
+import difflib
 import html
-import subprocess
-import tempfile
-import os
-import sys
-import logging
 import io
-from typing import List, Optional, Dict
+import logging
+import os
+import re
+import subprocess
+import sys
+import tempfile
 
 logger = logging.getLogger(__name__)
+
 
 class ReviewEngine:
     """
@@ -24,14 +24,14 @@ class ReviewEngine:
         r"(?P<api_key>api_key\s*=\s*['\"][a-zA-Z0-9_\-]{20,}['\"])|"
         r"(?P<password>password\s*=\s*['\"][^'\"]{6,}['\"])|"
         r"(?P<syscall>os\.system\(|subprocess\.call\(|eval\()",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
-    
+
     _RISK_LABELS = {
         "aws": "AWS Key",
         "api_key": "Generic API Key",
         "password": "Hardcoded Password",
-        "syscall": "Dangerous System Call"
+        "syscall": "Dangerous System Call",
     }
 
     @staticmethod
@@ -47,12 +47,8 @@ class ReviewEngine:
         old_lines = old_content.splitlines()
         new_lines = new_content.splitlines()
 
-        diff = difflib.unified_diff(
-            old_lines, new_lines, 
-            fromfile='Current', tofile='Proposed', 
-            lineterm=''
-        )
-        
+        diff = difflib.unified_diff(old_lines, new_lines, fromfile="Current", tofile="Proposed", lineterm="")
+
         # Theme-aware colors
         if theme_mode == "Dark":
             add_bg, add_fg = "#1e3a1e", "#afffbe"
@@ -68,36 +64,36 @@ class ReviewEngine:
         # Use StringIO for efficient string building
         output = io.StringIO()
         output.write(f"<pre style='font-family: monospace; white-space: pre; color: {default_fg};'>\n")
-        
+
         for line in diff:
             escaped_line = html.escape(line)
-            if line.startswith('+'):
+            if line.startswith("+"):
                 output.write(f"<div style='color: {add_fg}; background-color: {add_bg};'>{escaped_line}</div>\n")
-            elif line.startswith('-'):
+            elif line.startswith("-"):
                 output.write(f"<div style='color: {rem_fg}; background-color: {rem_bg};'>{escaped_line}</div>\n")
-            elif line.startswith('@@'):
+            elif line.startswith("@@"):
                 output.write(f"<div style='color: {info_fg}; font-weight: bold;'>{escaped_line}</div>\n")
-            elif line.startswith('^'):
+            elif line.startswith("^"):
                 output.write(f"<div style='color: {info_fg};'>{escaped_line}</div>\n")
             else:
                 output.write(f"<div>{escaped_line}</div>\n")
-        
+
         output.write("</pre>")
         return output.getvalue()
 
     @staticmethod
-    def analyze_code(code: str) -> List[str]:
+    def analyze_code(code: str) -> list[str]:
         """
         Performs static analysis on the code using AST and ruff (via stdin for speed).
         """
-        issues: List[str] = []
-        
+        issues: list[str] = []
+
         # 1. Basic AST check
         try:
             ast.parse(code)
         except SyntaxError as e:
             issues.append(f"CRITICAL: Syntax Error at line {e.lineno}: {e.msg}")
-            return issues 
+            return issues
         except Exception as e:
             issues.append(f"Error parsing code: {str(e)}")
             return issues
@@ -106,39 +102,49 @@ class ReviewEngine:
         try:
             # Try Ruff first with stdin to avoid disk I/O
             result = subprocess.run(
-                ['ruff', 'check', '-', '--no-cache', '--output-format=concise'],
+                ["ruff", "check", "-", "--no-cache", "--output-format=concise"],
                 input=code,
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
             )
             if result.stdout:
                 for line in result.stdout.splitlines():
                     # Ruff stdin output uses '-' as filename
                     clean_line = line.replace("-:", "code.py:").strip()
                     issues.append(f"LINT (ruff): {clean_line}")
-            
+
             # If ruff succeeded (even with issues), we return
-            if result.returncode in (0, 1): # 1 means issues found
+            if result.returncode in (0, 1):  # 1 means issues found
                 return issues
 
         except FileNotFoundError:
             # Fallback to pylint if ruff is not installed (requires temp file)
             tmp_path = None
             try:
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp:
+                with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp:
                     tmp.write(code)
                     tmp_path = tmp.name
 
                 result = subprocess.run(
-                    [sys.executable, '-m', 'pylint', '--max-line-length=120', '--reports=n', '--score=n',
-                     '--disable=C0114,C0115,C0116', tmp_path],
-                    capture_output=True, text=True, timeout=15
+                    [
+                        sys.executable,
+                        "-m",
+                        "pylint",
+                        "--max-line-length=120",
+                        "--reports=n",
+                        "--score=n",
+                        "--disable=C0114,C0115,C0116",
+                        tmp_path,
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
                 )
-                
+
                 if result.stdout:
                     for line in result.stdout.splitlines():
-                        if not line.startswith('************* Module') and tmp_path in line:
+                        if not line.startswith("************* Module") and tmp_path in line:
                             clean_line = line.replace(tmp_path, "code.py")
                             issues.append(f"LINT (pylint): {clean_line}")
             except Exception as e:
@@ -150,15 +156,15 @@ class ReviewEngine:
             issues.append("LINT: Analysis timed out.")
         except Exception as e:
             issues.append(f"LINT: Error running analysis: {str(e)}")
-            
+
         return issues
 
     @staticmethod
-    def scan_security(code: str) -> List[str]:
+    def scan_security(code: str) -> list[str]:
         """
         Scans for potential security risks using regex patterns.
         """
-        risks: List[str] = []
+        risks: list[str] = []
         for match in ReviewEngine._SECURITY_PATTERN.finditer(code):
             for group_name, value in match.groupdict().items():
                 if value:

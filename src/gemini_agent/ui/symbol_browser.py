@@ -1,7 +1,15 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, 
-                             QTreeWidget, QTreeWidgetItem, QLabel, QPushButton)
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt6.QtWidgets import (
+    QLineEdit,
+    QPushButton,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
 from gemini_agent.core.indexer import Symbol
+
 
 class SymbolBrowser(QWidget):
     symbol_selected = pyqtSignal(Symbol)
@@ -71,13 +79,13 @@ class SymbolBrowser(QWidget):
     def filter_symbols(self, text: str):
         self.tree.clear()
         text = text.lower()
-        
+
         # Group symbols by file
         files = {}
         for s in self.symbols:
             if text and text not in s.name.lower() and text not in s.file_path.lower():
                 continue
-            
+
             if s.file_path not in files:
                 files[s.file_path] = []
             files[s.file_path].append(s)
@@ -86,45 +94,45 @@ class SymbolBrowser(QWidget):
             file_item = QTreeWidgetItem([file_path])
             file_item.setData(0, Qt.ItemDataRole.UserRole, "file")
             self.tree.addTopLevelItem(file_item)
-            
+
             # Group by class if applicable
             classes = {}
             standalone = []
             for s in file_symbols:
-                if s.kind == 'class':
+                if s.kind == "class":
                     if s.name not in classes:
-                        classes[s.name] = {'item': None, 'symbols': []}
-                    classes[s.name]['symbols'].append(s)
+                        classes[s.name] = {"item": None, "symbols": []}
+                    classes[s.name]["symbols"].append(s)
                 elif s.parent:
                     if s.parent not in classes:
-                        classes[s.parent] = {'item': None, 'symbols': []}
-                    classes[s.parent]['symbols'].append(s)
+                        classes[s.parent] = {"item": None, "symbols": []}
+                    classes[s.parent]["symbols"].append(s)
                 else:
                     standalone.append(s)
 
             for class_name, data in classes.items():
                 # Find the class symbol itself if it exists in this file
-                class_symbol = next((s for s in data['symbols'] if s.kind == 'class' and s.name == class_name), None)
-                
+                class_symbol = next((s for s in data["symbols"] if s.kind == "class" and s.name == class_name), None)
+
                 class_item = QTreeWidgetItem([f"class {class_name}"])
                 class_item.setData(0, Qt.ItemDataRole.UserRole, class_symbol)
                 file_item.addChild(class_item)
-                
-                for s in data['symbols']:
-                    if s.kind != 'class':
-                        icon = "ƒ" if s.kind == 'function' else "m"
+
+                for s in data["symbols"]:
+                    if s.kind != "class":
+                        icon = "ƒ" if s.kind == "function" else "m"
                         item = QTreeWidgetItem([f"{icon} {s.name}"])
                         item.setData(0, Qt.ItemDataRole.UserRole, s)
                         class_item.addChild(item)
-                
+
                 class_item.setExpanded(True)
 
             for s in standalone:
-                icon = "ƒ" if s.kind == 'function' else "m"
+                icon = "ƒ" if s.kind == "function" else "m"
                 item = QTreeWidgetItem([f"{icon} {s.name}"])
                 item.setData(0, Qt.ItemDataRole.UserRole, s)
                 file_item.addChild(item)
-            
+
             file_item.setExpanded(True)
 
     def _on_item_double_clicked(self, item, column):
